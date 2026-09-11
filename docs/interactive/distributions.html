@@ -1,0 +1,756 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">
+<title>Distribution Atlas</title>
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global",scale:0.96},options:{enableMenu:false},
+  startup:{typeset:false,ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>document.dispatchEvent(new Event("mathjax-ready")));}}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f5f7; --surface:#ffffff; --ink:#15181d; --muted:#5d6470; --line:#d9dde3; --line-soft:#eceef1;
+  --disc:#2a78d6; --disc-soft:#cde2fb; --cont:#eb6834; --cont-soft:#fbd9c9;
+  --emp:#15181d; --band:rgba(21,24,29,.07);
+  --font-display:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --font-body:"Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121418; --surface:#1a1d23; --ink:#eef0f3; --muted:#9aa3b0; --line:#2b3038; --line-soft:#22262d;
+    --disc:#3987e5; --disc-soft:#1c3a5f; --cont:#d95926; --cont-soft:#4a2a1c;
+    --emp:#eef0f3; --band:rgba(238,240,243,.08);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121418; --surface:#1a1d23; --ink:#eef0f3; --muted:#9aa3b0; --line:#2b3038; --line-soft:#22262d;
+  --disc:#3987e5; --disc-soft:#1c3a5f; --cont:#d95926; --cont-soft:#4a2a1c;
+  --emp:#eef0f3; --band:rgba(238,240,243,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px 80px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -20px;padding:10px 20px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+nav .brand{font-family:var(--font-display);font-size:17px;margin-right:auto}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.02em}
+nav a:hover,nav a:focus-visible{color:var(--ink);outline:none;text-decoration:underline}
+h1{font-family:var(--font-display);font-weight:500;font-size:clamp(28px,4.5vw,40px);line-height:1.1;margin:44px 0 10px;text-wrap:balance}
+h2{font-family:var(--font-display);font-weight:500;font-size:24px;margin:56px 0 6px;text-wrap:balance}
+.lede{color:var(--muted);max-width:60ch;margin:0 0 6px}
+.hint{color:var(--muted);font-size:13px;margin:0 0 18px;max-width:70ch}
+.key{display:inline-flex;gap:14px;font-size:12px;color:var(--muted);margin:6px 0 14px;flex-wrap:wrap}
+.key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--font-body);fill:var(--ink)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.btn{font:inherit;font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--line-soft)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{opacity:.85}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:12.5px;padding:4px 10px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+mjx-container{color:var(--ink);font-size:16px}
+.frm{align-items:start}
+.frm .k{padding-top:4px}
+mjx-container svg{width:auto;height:auto;display:inline}
+.tex{display:inline-block}
+.lab{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+
+/* primer */
+.primer{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+@media (max-width:720px){.primer{grid-template-columns:1fr}}
+.primer .p{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.primer .p b{display:block;font-family:var(--font-display);font-weight:500;font-size:16px}
+.primer .p span{font-size:13px;color:var(--muted)}
+.primer svg{height:48px;margin:6px 0 4px}
+
+/* map */
+.map .node{cursor:pointer}
+.map .node>rect{fill:var(--surface);stroke:var(--line);stroke-width:1.2;transition:stroke .2s}
+.map .node:hover>rect,.map .node:focus-visible>rect{stroke:var(--ink)}
+.map .node.active>rect{stroke-width:2}
+.map .node.disc.active>rect{stroke:var(--disc)}
+.map .node.cont.active>rect{stroke:var(--cont)}
+.map .node text.name{font-family:var(--font-display);font-size:14.5px}
+.map .edge{fill:none;stroke:var(--muted);stroke-width:1.2;opacity:.7}
+.map .elabel{font-size:10.5px;fill:var(--muted);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.map .elabel tspan.m{font-family:var(--font-mono)}
+
+/* decision tree */
+.tree{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+@media (max-width:720px){.tree{grid-template-columns:1fr}}
+.tree .root{font-family:var(--font-display);font-size:17px;margin-bottom:8px}
+.tree .root i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.tree ul{list-style:none;margin:0;padding-left:16px;border-left:1.5px solid var(--line)}
+.tree li{margin:6px 0;font-size:14px;position:relative;padding-left:12px}
+.tree li::before{content:"";position:absolute;left:-16px;top:.75em;width:22px;border-top:1.5px solid var(--line)}
+.tree .q{color:var(--muted)}
+.tree .leaf{font:inherit;font-size:13.5px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;margin-left:4px}
+.tree .leaf:hover{border-color:var(--ink)}
+.tree .leaf.disc{border-color:var(--disc);color:var(--disc)} .tree .leaf.cont{border-color:var(--cont);color:var(--cont)}
+.tree .leaf.disc:hover{background:var(--disc);color:#fff} .tree .leaf.cont:hover{background:var(--cont);color:#fff}
+.tree .leaf:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* explorer */
+.explorer{display:grid;grid-template-columns:1fr 250px;gap:18px}
+@media (max-width:720px){.explorer{grid-template-columns:1fr}}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tabs button{font:inherit;font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on.disc{background:var(--disc);border-color:var(--disc);color:#fff}
+.tabs button.on.cont{background:var(--cont);border-color:var(--cont);color:#fff}
+.tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chart-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 4px 6px}
+.chart-title .name{font-family:var(--font-display);font-size:22px}
+.chart-title .name small{font-family:var(--font-body);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+.chart-title .name.disc small{color:var(--disc)} .chart-title .name.cont small{color:var(--cont)}
+.ctrl{display:flex;flex-direction:column;gap:14px}
+.ctrl .row label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.ctrl .row label b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--ink);margin:6px 0 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;border-top:1px solid var(--line);padding-top:12px}
+.stats .k{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.stats .v{font-family:var(--font-mono);font-size:17px;font-variant-numeric:tabular-nums}
+.actions{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line);padding-top:12px}
+.readout{font-size:13px;color:var(--muted);min-height:20px}
+.readout b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-family:var(--font-mono);font-size:12px;padding:4px 8px;border-radius:4px;white-space:nowrap;transform:translate(-50%,-130%);opacity:0;transition:opacity .1s}
+.chartwrap{position:relative}
+.story{margin:10px 4px 0;font-size:15px;max-width:66ch}
+
+/* quick read */
+.quick{grid-column:1/-1;border-top:1px solid var(--line);margin-top:6px;padding-top:14px;display:grid;grid-template-columns:1.25fr 1fr;gap:14px 28px}
+@media (max-width:720px){.quick{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink)}
+.facts{margin:0;padding-left:18px;font-size:14px}
+.facts li{margin:3px 0}
+.frm{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;font-size:14px}
+.frm .k{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.frm .tex{font-family:var(--font-mono);font-size:13px}
+.remember{grid-column:1/-1;background:var(--line-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.remember b{font-weight:600}
+details.deep{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px}
+details.deep summary{cursor:pointer;font-size:13.5px;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px}
+details.deep summary::-webkit-details-marker{display:none}
+details.deep summary::before{content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+details.deep[open] summary::before{transform:rotate(45deg)}
+details.deep summary:hover{color:var(--ink)}
+.deepgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px;margin-top:12px}
+@media (max-width:720px){.deepgrid{grid-template-columns:1fr}}
+.deepgrid ul{margin:0;padding-left:18px;font-size:14px}
+.deepgrid li{margin:4px 0}
+.qa{grid-column:1/-1}
+.qa details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:14px}
+.qa summary{cursor:pointer;font-weight:500}
+.qa p{margin:6px 0 0;color:var(--muted)}
+.qa p b{color:var(--ink);font-weight:500}
+
+/* bridges */
+.bridges{display:grid;grid-template-columns:1fr 250px;gap:18px}
+@media (max-width:720px){.bridges{grid-template-columns:1fr}}
+.blist{display:flex;flex-direction:column;gap:6px}
+.blist button{font:inherit;text-align:left;font-size:13.5px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;line-height:1.3}
+.blist button small{display:block;color:var(--muted);font-size:12px}
+.blist button.on{border-color:var(--ink);background:var(--line-soft)}
+.blist button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.scrub{display:flex;align-items:center;gap:10px;margin-top:10px}
+.scrub input{flex:1;margin:0}
+.bcap{font-size:13px;color:var(--muted);margin:8px 4px 0}
+.bcap b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+.bexp{grid-column:1/-1;border-top:1px solid var(--line);margin-top:8px;padding-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 24px}
+@media (max-width:720px){.bexp{grid-template-columns:1fr}}
+.bexp p{margin:0;font-size:14px}
+.bexp .rule{font-family:var(--font-mono);font-size:13px}
+.bexp .ask{grid-column:1/-1;background:var(--line-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.bexp .ask b{font-weight:600}
+.bexp .ask span{color:var(--muted)}
+
+/* drill */
+.drill{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:720px){.drill{grid-template-columns:1fr}}
+.drill details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px}
+.drill summary{cursor:pointer;font-weight:500;display:flex;gap:10px;align-items:baseline}
+.drill summary .tag{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-left:auto}
+.drill p{margin:8px 0 0;color:var(--muted)}
+.drill p b{color:var(--ink);font-weight:500}
+.notes{font-size:13.5px;color:var(--muted);max-width:70ch;margin-top:18px}
+.notes b{color:var(--ink);font-weight:500}
+.foot{margin-top:40px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<nav>
+  <span class="brand">Distribution Atlas</span>
+  <a href="#basics">Basics</a><a href="#map">Map</a><a href="#which">Which one</a><a href="#explore">Explore</a><a href="#bridges">Bridges</a><a href="#drill">Drill</a>
+</nav>
+
+<h1>Eleven distributions, one family.</h1>
+<p class="lede">Every named distribution an interviewer asks about is a coin flip, a count, or a wait, pushed to a limit. Read the map, then tap a node.</p>
+
+<section id="basics">
+  <div class="primer">
+    <div class="p"><b>PMF</b><svg viewBox="0 0 200 48" id="pmfGlyph"></svg><span>Discrete. Bar height <i>is</i> the probability of that exact value. Bars sum to 1.</span></div>
+    <div class="p"><b>PDF</b><svg viewBox="0 0 200 48" id="pdfGlyph"></svg><span>Continuous. Height is density, not probability. Area under a stretch is the probability. Total area is 1.</span></div>
+    <div class="p"><b>CDF</b><svg viewBox="0 0 200 48" id="cdfGlyph"></svg><span><span class="tex" data-tex="F(x)=P(X\le x)">F(x) = P(X ≤ x)</span>. Runs from 0 to 1, never decreases. Its slope is the PDF, so a steep CDF means a dense region.</span></div>
+  </div>
+</section>
+
+<section id="map">
+  <h2>Map</h2>
+  <div class="key"><span><i style="background:var(--disc)"></i>discrete · counts</span><span><i style="background:var(--cont)"></i>continuous · measurements</span><span>arrows = how one becomes another</span></div>
+  <div class="panel"><svg class="map" id="mapSvg" viewBox="0 0 1050 470" role="img" aria-label="Family map of probability distributions"></svg></div>
+</section>
+
+<section id="which">
+  <h2>Which one?</h2>
+  <p class="hint">The question an interviewer is really asking when they describe a scenario. Follow the branch, tap the leaf.</p>
+  <div class="panel tree">
+    <div>
+      <div class="root"><i style="background:var(--disc)"></i>I am counting something</div>
+      <ul>
+        <li><span class="q">Fixed number of trials, counting successes</span>
+          <ul>
+            <li>one trial <button class="leaf disc" data-id="bern">Bernoulli</button></li>
+            <li>with replacement, constant p <button class="leaf disc" data-id="binom">Binomial</button></li>
+            <li>without replacement, small pool <button class="leaf disc" data-id="hyper">Hypergeometric</button></li>
+          </ul></li>
+        <li><span class="q">Counting trials until success</span>
+          <ul>
+            <li>until the first <button class="leaf disc" data-id="geom">Geometric</button></li>
+            <li>until the r-th <button class="leaf disc" data-id="negbin">Negative Binomial</button></li>
+          </ul></li>
+        <li><span class="q">Counting events in a window of time or space</span>
+          <ul>
+            <li>variance ≈ mean <button class="leaf disc" data-id="pois">Poisson</button></li>
+            <li>variance ≫ mean <button class="leaf disc" data-id="negbin">Negative Binomial</button></li>
+          </ul></li>
+      </ul>
+    </div>
+    <div>
+      <div class="root"><i style="background:var(--cont)"></i>I am measuring something</div>
+      <ul>
+        <li><span class="q">Bounded on both sides</span>
+          <ul>
+            <li>every value equally likely <button class="leaf cont" data-id="unif">Uniform</button></li>
+            <li>it is a probability or proportion <button class="leaf cont" data-id="beta">Beta</button></li>
+          </ul></li>
+        <li><span class="q">A positive wait or amount</span>
+          <ul>
+            <li>until the next event <button class="leaf cont" data-id="expo">Exponential</button></li>
+            <li>until the k-th event, or skewed positive <button class="leaf cont" data-id="gamma">Gamma</button></li>
+          </ul></li>
+        <li><span class="q">A sum, an average, or noise</span>
+          <ul>
+            <li>many small independent effects <button class="leaf cont" data-id="norm">Normal</button></li>
+          </ul></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="explore">
+  <h2>Explore</h2>
+  <p class="hint">Drag the sliders. The shaded band is one standard deviation each side of the mean. Switch to CDF to see the same distribution as P(X ≤ x). Draw samples to watch the empirical shape converge on the exact one.</p>
+  <div class="panel explorer">
+    <div>
+      <div class="tabs" id="tabs"></div>
+      <div class="chart-title"><span class="name" id="exName"></span><span class="seg" id="viewSeg"><button data-v="pdf" class="on">Density</button><button data-v="cdf">CDF</button></span></div>
+      <div class="chartwrap"><svg id="exSvg" viewBox="0 0 640 300"></svg><div class="tip" id="tip"></div></div>
+      <p class="story" id="exStory"></p>
+    </div>
+    <div class="ctrl">
+      <div id="sliders"></div>
+      <div class="stats">
+        <div><div class="k">mean</div><div class="v" id="stMean"></div></div>
+        <div><div class="k">std dev</div><div class="v" id="stSd"></div></div>
+        <div><div class="k">variance</div><div class="v" id="stVar"></div></div>
+        <div><div class="k">samples</div><div class="v" id="stN">0</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="draw1">Draw 1</button>
+        <button class="btn" id="draw50">Draw 50</button>
+        <button class="btn" id="draw500">Draw 500</button>
+        <button class="btn" id="clear">Clear</button>
+      </div>
+      <div class="readout" id="readout">No samples yet.</div>
+    </div>
+    <div class="quick" id="quick"></div>
+  </div>
+</section>
+
+<section id="bridges">
+  <h2>Bridges</h2>
+  <p class="hint">The limits interviewers love. Each one says "under these conditions, you may swap this distribution for that one." Press play, or scrub, and read the rule of thumb underneath.</p>
+  <div class="panel bridges">
+    <div>
+      <svg id="brSvg" viewBox="0 0 640 300"></svg>
+      <div class="scrub"><button class="btn" id="brPlay">Play</button><input type="range" id="brT" min="0" max="1000" value="0" aria-label="scrub"></div>
+      <p class="bcap" id="brCap"></p>
+    </div>
+    <div class="blist" id="blist"></div>
+    <div class="bexp" id="bexp"></div>
+  </div>
+</section>
+
+<section id="drill">
+  <h2>Drill</h2>
+  <p class="hint">Eight problems that come up again and again. Answer out loud before opening.</p>
+  <div class="drill" id="drillGrid"></div>
+  <p class="notes"><b>Not on this page on purpose.</b> The t, χ² and F distributions describe test statistics, not data. They live with hypothesis testing. Log-normal (a Normal after taking logs, common for prices and durations) is worth one sentence: if log X is Normal, X is log-normal, right-skewed and positive.</p>
+  <div class="foot"><span>Blue = discrete, orange = continuous. Curves are exact. Histograms are Monte Carlo.</span><button class="btn" id="copyMd">Copy summary as markdown</button></div>
+</section>
+</div>
+
+<script>
+// ---------- math ----------
+const LG=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+function lgamma(z){ if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z); z-=1; let a=LG[0]; const t=z+7.5; for(let i=1;i<9;i++) a+=LG[i]/(z+i); return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(a); }
+const lchoose=(n,k)=>lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);
+const binomPmf=(n,p,k)=>{ if(k<0||k>n) return 0; if(p<=0) return k===0?1:0; if(p>=1) return k===n?1:0; return Math.exp(lchoose(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p)); };
+const poisPmf=(l,k)=>k<0?0:Math.exp(-l+k*Math.log(l)-lgamma(k+1));
+const geomPmf=(p,k)=>k<1?0:Math.pow(1-p,k-1)*p;
+const nbPmf=(r,p,k)=>k<0?0:Math.exp(lchoose(k+r-1,k)+r*Math.log(p)+k*Math.log(1-p));
+const hypPmf=(N,K,n,x)=>(x<0||x>n||x>K||n-x>N-K)?0:Math.exp(lchoose(K,x)+lchoose(N-K,n-x)-lchoose(N,n));
+const normPdf=(m,s,x)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const expPdf=(l,x)=>x<0?0:l*Math.exp(-l*x);
+const gammaPdf=(k,l,x)=>x<=0?0:Math.exp(k*Math.log(l)+(k-1)*Math.log(x)-l*x-lgamma(k));
+const betaPdf=(a,b,x)=>(x<=0||x>=1)?((x===0&&a===1)?b:(x===1&&b===1)?a:0):Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)+lgamma(a+b)-lgamma(a)-lgamma(b));
+const U=Math.random;
+function normSample(m,s){ const u=1-U(), v=U(); return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function poisSample(l){ const L=Math.exp(-l); let k=0,p=1; do{k++;p*=U();}while(p>L); return k-1; }
+const geomSample=p=>Math.ceil(Math.log(1-U())/Math.log(1-p));
+const expSample=l=>-Math.log(1-U())/l;
+function gammaSample(k){ // Marsaglia-Tsang, shape k >= 1, rate 1
+  const d=k-1/3, c=1/Math.sqrt(9*d); for(;;){ let x,v; do{x=normSample(0,1);v=1+c*x;}while(v<=0); v=v*v*v; const u=U(); if(u<1-0.0331*x**4) return d*v; if(Math.log(u)<0.5*x*x+d*(1-v+Math.log(v))) return d*v; } }
+const fmt=(v,d=2)=>Number.isFinite(v)?(+v.toFixed(d)).toString():"—";
+
+// ---------- LaTeX (MathJax SVG if it loads, Unicode fallback otherwise) ----------
+let mjReady=false;
+function typeset(root){ if(!mjReady||!window.MathJax||!MathJax.typesetPromise) return;
+  const els=[...root.querySelectorAll(".tex[data-tex]:not([data-done])")]; if(!els.length) return;
+  els.forEach(e=>{e.textContent="\\(\\displaystyle "+e.dataset.tex+"\\)"; e.dataset.done="1"; e.style.fontFamily="inherit";});
+  MathJax.typesetPromise(els).catch(()=>{}); }
+document.addEventListener("mathjax-ready",()=>{mjReady=true;typeset(document.body);});
+const T=(tex,plain)=>`<span class="tex" data-tex="${tex.replace(/"/g,"&quot;")}">${plain}</span>`;
+
+// ---------- catalogue ----------
+const R=String.raw;
+const DISTS={
+  bern:{name:"Bernoulli",fam:"disc",story:"One trial. Success with probability p, failure otherwise.",
+    params:[{k:"p",min:0.02,max:0.98,step:0.01,v:0.3}],
+    pmf_:[R`P(X=1)=p,\quad P(X=0)=1-p`,"P(X=1) = p,  P(X=0) = 1−p"],cdf_:[R`F(x)=1-p \text{ for } 0\le x<1`,"F(x) = 1−p for 0 ≤ x < 1"],mean_:[R`p`,"p"],var_:[R`p(1-p)`,"p(1−p)"],
+    mean:o=>o.p,vari:o=>o.p*(1-o.p),
+    domain:o=>[0,1],pmf:(o,k)=>k===1?o.p:k===0?1-o.p:0,sample:o=>U()<o.p?1:0,
+    examples:["click or no click","coin toss","defective or not"],
+    facts:["The atom. Every discrete distribution here is built from it.","Variance p(1−p) peaks at p = 0.5, the most uncertain coin.","Mean of many Bernoullis = a proportion, which is why conversion rates get Normal confidence intervals."],
+    remember:"An indicator variable <b>is</b> a Bernoulli. Averaging indicators gives a rate, and the CLT gives that rate a Normal error bar.",
+    traits:["Support {0, 1}. One parameter.","Sum of n of them with the same p is Binomial(n, p).","The likelihood behind logistic regression."],
+    links:["Binomial: sum of n Bernoullis","Geometric: trials until the first 1","Beta: what you believe about p"],
+    qa:[{q:"Why is p(1−p) the variance?",a:"E[X²] = p because X² = X. So Var = E[X²] − E[X]² = p − p² = p(1−p)."},{q:"When is a coin flip <i>not</i> Bernoulli?",a:"When p changes between trials or trials influence each other. Then the sum is not Binomial either."}]},
+  binom:{name:"Binomial",fam:"disc",story:"Count successes in n independent trials that share the same p.",
+    params:[{k:"n",min:1,max:60,step:1,v:12},{k:"p",min:0.02,max:0.98,step:0.01,v:0.3}],
+    pmf_:[R`P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}`,"P(X=k) = C(n,k) pᵏ (1−p)ⁿ⁻ᵏ"],cdf_:[R`\sum_{i\le k} P(X=i)`,"no closed form, sum the PMF"],mean_:[R`np`,"np"],var_:[R`np(1-p)`,"np(1−p)"],
+    mean:o=>o.n*o.p,vari:o=>o.n*o.p*(1-o.p),
+    domain:o=>[0,o.n],pmf:(o,k)=>binomPmf(o.n,o.p,k),sample:o=>{let s=0;for(let i=0;i<o.n;i++)s+=U()<o.p;return s;},
+    examples:["conversions among n visitors","heads in 10 flips","defects in a batch of 50"],
+    facts:["Needs three things: fixed n, independence, constant p. Break one and it is not Binomial.","Symmetric only at p = 0.5. Otherwise skewed toward the rarer outcome.","Approximated by Normal(np, np(1−p)) when np and n(1−p) are both ≥ 10."],
+    remember:"An A/B test's conversion count per arm is Binomial. The z-test on conversion rates is the Normal approximation of it.",
+    traits:["Support 0..n. Two parameters.","Sum of independent Binomials with the same p is Binomial.","Mode is near np. Skew shrinks like 1/√n."],
+    links:["Bernoulli: n = 1","Poisson: n → ∞ with np fixed","Normal: n large (CLT)","Hypergeometric: without replacement, becomes Binomial when N ≫ n","Beta: the posterior for p after seeing the counts"],
+    qa:[{q:"Two arms, 1,000 users each, 30 vs 42 conversions. What is the model?",a:"Each arm is Binomial(1000, pᵢ). With np ≥ 10 use the Normal approximation and a two-proportion z-test. With smaller counts use Fisher's exact test, which is Hypergeometric."},{q:"Why does variance depend on p?",a:"Var = np(1−p) is n copies of the Bernoulli variance. Rates near 0 or 1 are less noisy than rates near 0.5."}]},
+  geom:{name:"Geometric",fam:"disc",story:"Number of trials until the first success. Each trial succeeds with probability p.",
+    params:[{k:"p",min:0.05,max:0.9,step:0.01,v:0.25}],
+    pmf_:[R`P(X=k)=(1-p)^{k-1}p`,"P(X=k) = (1−p)ᵏ⁻¹ p"],cdf_:[R`P(X\le k)=1-(1-p)^k`,"P(X ≤ k) = 1 − (1−p)ᵏ"],mean_:[R`\frac{1}{p}`,"1/p"],var_:[R`\frac{1-p}{p^2}`,"(1−p)/p²"],
+    mean:o=>1/o.p,vari:o=>(1-o.p)/(o.p*o.p),
+    domain:o=>[1,Math.max(12,Math.ceil(4/o.p))],pmf:(o,k)=>geomPmf(o.p,k),sample:o=>geomSample(o.p),
+    examples:["calls until a sale","retries until a request succeeds","rolls until a six"],
+    facts:["Memoryless: nine failures in a row do not make the tenth try more likely. The only discrete distribution with this property.","Tail P(X > k) = (1−p)ᵏ. Easy to remember and often asked.","Mean 1/p: a 1-in-20 event takes 20 tries on average."],
+    remember:"Memoryless means <b>P(X > s+t | X > s) = P(X > t)</b>. The past resets nothing.",
+    traits:["Support 1, 2, 3, … (some texts count failures instead, starting at 0).","Always right-skewed. Mode is 1.","Discrete twin of the Exponential."],
+    links:["Bernoulli: the trials being counted","Negative Binomial: wait for r successes instead of 1","Exponential: shrink the time step"],
+    qa:[{q:"Expected number of rolls to see a six?",a:"Geometric with p = 1/6, mean 1/p = 6."},{q:"You have failed 9 times. Expected remaining tries?",a:"Still 1/p. Memorylessness: the count so far carries no information."}]},
+  negbin:{name:"Negative Binomial",fam:"disc",story:"Number of failures before the r-th success. Geometric, but you keep going until r wins.",
+    params:[{k:"r",min:1,max:20,step:1,v:3},{k:"p",min:0.05,max:0.9,step:0.01,v:0.4}],
+    pmf_:[R`P(X=k)=\binom{k+r-1}{k}p^r(1-p)^k`,"P(X=k) = C(k+r−1,k) pʳ (1−p)ᵏ"],cdf_:[R`\sum_{i\le k} P(X=i)`,"no closed form, sum the PMF"],mean_:[R`\frac{r(1-p)}{p}`,"r(1−p)/p"],var_:[R`\frac{r(1-p)}{p^2}`,"r(1−p)/p²"],
+    mean:o=>o.r*(1-o.p)/o.p,vari:o=>o.r*(1-o.p)/(o.p*o.p),
+    domain:o=>{const m=o.r*(1-o.p)/o.p,s=Math.sqrt(o.r*(1-o.p))/o.p;return [0,Math.max(10,Math.ceil(m+4*s))];},pmf:(o,k)=>nbPmf(o.r,o.p,k),sample:o=>{let s=0;for(let i=0;i<o.r;i++)s+=geomSample(o.p)-1;return s;},
+    examples:["support tickets before 3 escalations","overdispersed counts of purchases","goals conceded before the 5th win"],
+    facts:["r = 1 gives the Geometric (counting failures).","Variance is always larger than the mean, by a factor 1/p. That is the overdispersion Poisson cannot model.","It is a Poisson whose rate λ is itself random (Gamma-distributed)."],
+    remember:"When count data has <b>variance &gt; mean</b>, reach for Negative Binomial regression instead of Poisson regression.",
+    traits:["Support 0, 1, 2, … . Two parameters.","Sum of r independent Geometrics (failure-counting).","Alternative parameterization by mean μ and dispersion k is what regression libraries use."],
+    links:["Geometric: r = 1","Poisson: r → ∞ with mean fixed","Gamma: the mixing distribution for the rate"],
+    qa:[{q:"Poisson fits badly, residual variance too high. Fix?",a:"Overdispersion. Use Negative Binomial: it adds a dispersion parameter so variance = μ + μ²/k instead of μ."},{q:"Why 'negative'?",a:"The PMF can be written with a binomial coefficient with a negative upper index, C(−r, k). Nothing about the values is negative."}]},
+  hyper:{name:"Hypergeometric",fam:"disc",story:"Successes in n draws without replacement from N items, K of which are successes.",
+    params:[{k:"N",min:10,max:200,step:1,v:50},{k:"K",min:1,max:200,step:1,v:15},{k:"n",min:1,max:200,step:1,v:10}],
+    pmf_:[R`P(X=x)=\frac{\binom{K}{x}\binom{N-K}{n-x}}{\binom{N}{n}}`,"P(X=x) = C(K,x) C(N−K,n−x) / C(N,n)"],cdf_:[R`\sum_{i\le x} P(X=i)`,"no closed form, sum the PMF"],mean_:[R`n\frac{K}{N}`,"nK/N"],var_:[R`n\frac{K}{N}\Big(1-\frac{K}{N}\Big)\frac{N-n}{N-1}`,"nK/N · (1−K/N) · (N−n)/(N−1)"],
+    mean:o=>o.n*o.K/o.N,vari:o=>o.n*(o.K/o.N)*(1-o.K/o.N)*(o.N-o.n)/(o.N-1),
+    domain:o=>[Math.max(0,o.n-(o.N-o.K)),Math.min(o.n,o.K)],pmf:(o,x)=>hypPmf(o.N,o.K,o.n,x),
+    sample:o=>{let K=o.K,N=o.N,s=0;for(let i=0;i<o.n;i++){if(U()<K/N){s++;K--;}N--;}return s;},
+    examples:["aces in a 5-card hand","defects in a sample of 10 from a lot of 50","matching numbers in a lottery"],
+    facts:["Same story as Binomial, but each draw changes the odds for the next.","Variance carries the finite population correction (N−n)/(N−1). Sampling most of the population leaves little uncertainty.","When n/N < 5% the Binomial(n, K/N) is a fine substitute."],
+    remember:"Fisher's exact test for a 2×2 table <b>is</b> the Hypergeometric. Use it when Binomial counts are too small for the z-test.",
+    traits:["Support from max(0, n−(N−K)) to min(n, K). Three parameters.","Mean matches Binomial with p = K/N. Only the variance shrinks.","Underlies exact tests and capture-recapture estimates."],
+    links:["Binomial: N → ∞ with K/N fixed"],
+    qa:[{q:"Probability of exactly 2 aces in 5 cards?",a:"N = 52, K = 4, n = 5, x = 2. C(4,2)C(48,3)/C(52,5) ≈ 0.040."},{q:"Why is the variance smaller than Binomial?",a:"Without replacement, draws are negatively correlated: a success now leaves fewer successes for later. The correction (N−n)/(N−1) is that effect."}]},
+  pois:{name:"Poisson",fam:"disc",story:"Count of events in a fixed window when events arrive independently at an average rate λ.",
+    params:[{k:"λ",min:0.2,max:20,step:0.1,v:4}],
+    pmf_:[R`P(X=k)=\frac{\lambda^k e^{-\lambda}}{k!}`,"P(X=k) = λᵏ e^(−λ) / k!"],cdf_:[R`\sum_{i\le k} P(X=i)`,"no closed form, sum the PMF"],mean_:[R`\lambda`,"λ"],var_:[R`\lambda`,"λ"],
+    mean:o=>o["λ"],vari:o=>o["λ"],
+    domain:o=>[0,Math.max(12,Math.ceil(o["λ"]+4*Math.sqrt(o["λ"])))],pmf:(o,k)=>poisPmf(o["λ"],k),sample:o=>poisSample(o["λ"]),
+    examples:["emails per hour","server errors per minute","goals in a match"],
+    facts:["Mean equals variance. If your counts are more spread than that, it is overdispersed.","Rates add: two independent Poisson streams merge into Poisson(λ₁ + λ₂).","Double the window, double λ. The rate per unit time is the real parameter."],
+    remember:"Poisson is the <b>law of rare events</b>: many chances, each unlikely. That is why it appears whenever you count occurrences in time or space.",
+    traits:["Support 0, 1, 2, … . One parameter.","Right-skewed for small λ, nearly Normal past λ ≈ 20.","Time between events is Exponential(λ); count of events is Poisson(λt)."],
+    links:["Binomial: n → ∞, p → 0, np = λ","Exponential: the gaps between its events","Normal: λ large","Negative Binomial: Poisson with a random rate"],
+    qa:[{q:"A site gets 3 errors per hour on average. P(zero errors in the next hour)?",a:"e^(−3) ≈ 0.05. P(at least one) = 0.95."},{q:"How do you check the Poisson assumption?",a:"Compare sample variance to sample mean. Much larger means overdispersion, so use Negative Binomial or a quasi-Poisson model."}]},
+  unif:{name:"Uniform",fam:"cont",story:"Every value between a and b is equally likely. Flat.",
+    params:[{k:"a",min:-5,max:4,step:0.1,v:0},{k:"b",min:1,max:10,step:0.1,v:4}],
+    pmf_:[R`f(x)=\frac{1}{b-a},\quad a\le x\le b`,"f(x) = 1/(b−a) on [a, b]"],cdf_:[R`F(x)=\frac{x-a}{b-a}`,"F(x) = (x−a)/(b−a)"],mean_:[R`\frac{a+b}{2}`,"(a+b)/2"],var_:[R`\frac{(b-a)^2}{12}`,"(b−a)²/12"],
+    mean:o=>(o.a+o.b)/2,vari:o=>(o.b-o.a)**2/12,
+    domain:o=>{const w=Math.max(o.b-o.a,0.5);return [o.a-0.25*w,o.b+0.25*w];},pdf:(o,x)=>x>=o.a&&x<=o.b?1/(o.b-o.a):0,sample:o=>o.a+(o.b-o.a)*U(),
+    examples:["a random number generator","rounding error","arrival time within a known window"],
+    facts:["Maximum ignorance on a bounded range. If you know only the limits, this is the honest prior.","Variance (b−a)²/12. The 12 is the interview trap.","Any distribution can be sampled from Uniform(0,1) by pushing it through the inverse CDF."],
+    remember:"<b>Inverse transform sampling</b>: X = F⁻¹(U) with U ~ Uniform(0,1) has CDF F. Every random number generator starts here.",
+    traits:["Support [a, b]. Two parameters.","The discrete version on n equally spaced values has variance (n²−1)/12.","p-values under a true null are Uniform(0,1)."],
+    links:["Normal: average many Uniforms (CLT)","Beta(1,1) is Uniform(0,1)","Any distribution: apply the inverse CDF"],
+    qa:[{q:"Why are p-values Uniform under the null?",a:"A p-value is F(T) for the null CDF of the test statistic. Pushing a variable through its own CDF always gives Uniform(0,1)."},{q:"Sum of two Uniform(0,1)?",a:"Triangular on [0, 2], peaked at 1. The first step of the CLT staircase."}]},
+  beta:{name:"Beta",fam:"cont",story:"A distribution over a probability. What you believe about p after α−1 successes and β−1 failures.",
+    params:[{k:"α",min:1,max:12,step:0.5,v:3},{k:"β",min:1,max:12,step:0.5,v:5}],
+    pmf_:[R`f(x)=\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)},\quad 0\le x\le 1`,"f(x) = x^(α−1)(1−x)^(β−1) / B(α,β) on [0,1]"],cdf_:[R`I_x(\alpha,\beta)\ \text{(regularized incomplete beta)}`,"regularized incomplete beta, tabulated"],mean_:[R`\frac{\alpha}{\alpha+\beta}`,"α/(α+β)"],var_:[R`\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}`,"αβ / ((α+β)²(α+β+1))"],
+    mean:o=>o["α"]/(o["α"]+o["β"]),vari:o=>o["α"]*o["β"]/((o["α"]+o["β"])**2*(o["α"]+o["β"]+1)),
+    domain:o=>[0,1],pdf:(o,x)=>betaPdf(o["α"],o["β"],x),sample:o=>{const g1=gammaSample(o["α"]),g2=gammaSample(o["β"]);return g1/(g1+g2);},
+    examples:["posterior of a conversion rate","prior on a click-through rate","batting average after 30 at-bats"],
+    facts:["Beta(1,1) is flat: Uniform(0,1), no opinion. Bigger α+β means a stronger opinion.","Conjugate to Bernoulli and Binomial: prior Beta(α, β) plus s successes and f failures gives posterior Beta(α+s, β+f).","Mean α/(α+β) is the smoothed success rate. Laplace smoothing is Beta(1,1) in disguise."],
+    remember:"<b>Bayesian A/B testing</b>: sample p_A ~ Beta(1+s_A, 1+f_A) and p_B likewise, then P(B &gt; A) is just the fraction of draws where p_B &gt; p_A.",
+    traits:["Support [0, 1]. Two shape parameters.","U-shaped when both < 1, bell-shaped when both > 1, skewed when unequal.","Order statistics of Uniforms are Beta: the k-th smallest of n is Beta(k, n−k+1)."],
+    links:["Uniform: α = β = 1","Binomial: its conjugate likelihood","Gamma: Beta is a ratio of two Gammas","Normal: large α, β"],
+    qa:[{q:"A new ad has 2 clicks in 10 views. Best estimate of its rate?",a:"Raw 20% is noisy. With a Beta(1,1) prior the posterior is Beta(3, 9), mean 3/12 = 25%, and wide. With a Beta(2, 20) prior from past ads it is Beta(4, 28), mean 12.5%. The prior does the shrinkage."},{q:"Why Beta rather than Normal for a rate?",a:"Beta lives on [0,1] and updates in closed form with Binomial data. A Normal would put mass outside [0,1] and would not stay Normal after the update."}]},
+  expo:{name:"Exponential",fam:"cont",story:"Wait time until the next event when events arrive at rate λ.",
+    params:[{k:"λ",min:0.2,max:4,step:0.05,v:1}],
+    pmf_:[R`f(x)=\lambda e^{-\lambda x},\quad x\ge 0`,"f(x) = λ e^(−λx),  x ≥ 0"],cdf_:[R`F(x)=1-e^{-\lambda x}`,"F(x) = 1 − e^(−λx)"],mean_:[R`\frac{1}{\lambda}`,"1/λ"],var_:[R`\frac{1}{\lambda^2}`,"1/λ²"],
+    mean:o=>1/o["λ"],vari:o=>1/(o["λ"]**2),
+    domain:o=>[0,6/o["λ"]],pdf:(o,x)=>expPdf(o["λ"],x),sample:o=>expSample(o["λ"]),
+    examples:["seconds between requests","lifetime of a bulb","time to next customer"],
+    facts:["Memoryless: a bulb that has lasted 1,000 hours has the same remaining life as a new one. The only continuous distribution with this property.","Survival P(X > x) = e^(−λx). Half the waits are shorter than ln2/λ, well below the mean.","Mean 1/λ: rate 4 per hour means 15 minutes between events on average."],
+    remember:"Poisson counts, Exponential waits. <b>Same process, two views</b>: events in a window vs. gap between events.",
+    traits:["Support x ≥ 0. One parameter, the rate.","Constant hazard: the chance of the event in the next instant never changes.","Minimum of independent Exponentials is Exponential with the rates summed."],
+    links:["Poisson: counts of the same events","Geometric: its discrete twin","Gamma: sum of k of them"],
+    qa:[{q:"Bus arrives every 10 minutes on average, Exponential. You have waited 5. Expected remaining wait?",a:"Still 10 minutes. Memoryless. This is the inspection paradox interviewers like."},{q:"Two servers, mean response 2s and 3s. Time until the first responds?",a:"Exponential with rate 1/2 + 1/3 = 5/6, mean 1.2s."}]},
+  gamma:{name:"Gamma",fam:"cont",story:"Wait time until the k-th event when events arrive at rate λ. A sum of k Exponentials.",
+    params:[{k:"k",min:1,max:10,step:1,v:3},{k:"λ",min:0.2,max:4,step:0.05,v:1}],
+    pmf_:[R`f(x)=\frac{\lambda^k x^{k-1} e^{-\lambda x}}{\Gamma(k)},\quad x>0`,"f(x) = λᵏ xᵏ⁻¹ e^(−λx) / Γ(k)"],cdf_:[R`\text{no closed form for non-integer } k`,"no closed form for non-integer k"],mean_:[R`\frac{k}{\lambda}`,"k/λ"],var_:[R`\frac{k}{\lambda^2}`,"k/λ²"],
+    mean:o=>o.k/o["λ"],vari:o=>o.k/(o["λ"]**2),
+    domain:o=>[0,(o.k+4*Math.sqrt(o.k))/o["λ"]],pdf:(o,x)=>gammaPdf(o.k,o["λ"],x),sample:o=>{let s=0;for(let i=0;i<o.k;i++)s+=expSample(o["λ"]);return s;},
+    examples:["time until the 3rd sale","total rainfall over a season","insurance claim sizes"],
+    facts:["k = 1 is Exponential. As k grows the bump moves right and becomes Normal-shaped.","Shape k, rate λ. Some libraries use scale θ = 1/λ instead, a common source of bugs.","Chi-square with ν degrees of freedom is Gamma(k = ν/2, λ = 1/2)."],
+    remember:"Gamma is the <b>conjugate prior for a Poisson rate</b>. Prior Gamma(k, λ) plus n observed counts gives posterior Gamma(k + Σx, λ + n).",
+    traits:["Support x > 0. Two parameters.","Sums of independent Gammas with the same rate are Gamma.","Flexible right-skewed shape for positive quantities: durations, costs, amounts."],
+    links:["Exponential: k = 1","Poisson: the count view of the same events","Beta: ratio of two Gammas","Normal: k large"],
+    qa:[{q:"Events at 2 per hour. Expected time until the 5th?",a:"Gamma(5, 2), mean k/λ = 2.5 hours, variance k/λ² = 1.25."},{q:"Why is Gamma used as a prior for rates?",a:"Its support is positive and multiplying it by a Poisson likelihood gives another Gamma, so the posterior stays in closed form."}]},
+  norm:{name:"Normal",fam:"cont",story:"The shape every sum or average of many small independent effects drifts toward.",
+    params:[{k:"μ",min:-5,max:5,step:0.1,v:0},{k:"σ",min:0.3,max:3,step:0.05,v:1}],
+    pmf_:[R`f(x)=\frac{1}{\sigma\sqrt{2\pi}}\,e^{-\frac{(x-\mu)^2}{2\sigma^2}}`,"f(x) = e^(−(x−μ)²/2σ²) / (σ√2π)"],cdf_:[R`\Phi\!\left(\frac{x-\mu}{\sigma}\right)`,"Φ((x−μ)/σ), tabulated"],mean_:[R`\mu`,"μ"],var_:[R`\sigma^2`,"σ²"],
+    mean:o=>o["μ"],vari:o=>o["σ"]**2,
+    domain:o=>[o["μ"]-4*o["σ"],o["μ"]+4*o["σ"]],pdf:(o,x)=>normPdf(o["μ"],o["σ"],x),sample:o=>normSample(o["μ"],o["σ"]),
+    examples:["heights","measurement noise","a sample mean"],
+    facts:["Empirical rule: 68% within 1σ, 95% within 2σ, 99.7% within 3σ.","Central Limit Theorem: the mean of n i.i.d. draws is approximately Normal(μ, σ²/n), whatever the original shape.","Standardize with z = (x−μ)/σ. The 95% two-sided critical value is 1.96."],
+    remember:"<b>CLT</b> is why Normal is everywhere: it describes averages, not raw data. Raw data can be anything.",
+    traits:["Support all reals. Two parameters.","Sums of independent Normals are Normal. Linear transforms stay Normal.","Fully described by mean and variance, so uncorrelated Normals are independent."],
+    links:["Binomial: n large","Poisson: λ large","Gamma: k large","Uniform or anything: average many (CLT)"],
+    qa:[{q:"Why can you use a z-test on a conversion rate that is clearly not Normal?",a:"The test is on the sample mean, and the CLT makes that Normal. The rate is a mean of Bernoullis."},{q:"Sample of 100 has mean 50, sd 10. 95% CI for the mean?",a:"50 ± 1.96 × 10/√100 = 50 ± 1.96. The standard error is σ/√n."}]}
+};
+const ORDER=["bern","binom","geom","negbin","hyper","pois","unif","beta","expo","gamma","norm"];
+const famColor=f=>f==="disc"?"var(--disc)":"var(--cont)";
+const famSoft=f=>f==="disc"?"var(--disc-soft)":"var(--cont-soft)";
+
+function miniShape(id,w,h){
+  const d=DISTS[id], o=Object.fromEntries(d.params.map(p=>[p.k,p.v]));
+  const [lo,hi]=d.domain(o); let out="";
+  if(d.pmf){ const n=hi-lo+1, bw=Math.min(6,(w/n)*0.6); let max=0; const v=[]; for(let k=lo;k<=hi;k++){const y=d.pmf(o,k);v.push(y);max=Math.max(max,y);}
+    v.forEach((y,i)=>{const x=(i+0.5)/n*w; out+=`<rect x="${(x-bw/2).toFixed(1)}" y="${(h-h*0.9*y/max).toFixed(1)}" width="${bw.toFixed(1)}" height="${(h*0.9*y/max).toFixed(1)}" rx="1.5" fill="${famColor(d.fam)}"/>`;});
+  } else { const N=60; let max=0; const v=[]; for(let i=0;i<=N;i++){const x=lo+(hi-lo)*i/N;const y=d.pdf(o,x);v.push([x,y]);max=Math.max(max,y);}
+    const pts=v.map(([x,y],i)=>`${(i/N*w).toFixed(1)},${(h-h*0.9*y/max).toFixed(1)}`).join(" ");
+    out+=`<polyline points="${pts}" stroke="${famColor(d.fam)}" fill="none" stroke-width="1.8" stroke-linejoin="round"/>`; }
+  return out;
+}
+
+// ---------- primer glyphs ----------
+(function(){
+  let s=""; const w=200,h=48; const ks=[0,1,2,3,4,5,6,7]; const pm=ks.map(k=>binomPmf(7,0.4,k)); const mx=Math.max(...pm);
+  pm.forEach((p,i)=>{const x=(i+0.5)/8*w; s+=`<rect x="${x-6}" y="${h-h*0.9*p/mx}" width="12" height="${h*0.9*p/mx}" rx="2" fill="var(--disc)"/>`;});
+  document.getElementById("pmfGlyph").innerHTML=s;
+  let pts=[]; for(let i=0;i<=60;i++){const x=-3+6*i/60;const y=h-h*0.9*normPdf(0,1,x)/0.4; pts.push(`${i/60*w},${y}`);}
+  const sh=[]; for(let i=25;i<=38;i++){const x=-3+6*i/60;sh.push(`${i/60*w},${h-h*0.9*normPdf(0,1,x)/0.4}`);}
+  document.getElementById("pdfGlyph").innerHTML=`<polygon points="${sh[0].split(",")[0]},${h} ${sh.join(" ")} ${sh[sh.length-1].split(",")[0]},${h}" fill="var(--cont-soft)"/><polyline points="${pts.join(" ")}" fill="none" stroke="var(--cont)" stroke-width="2"/>`;
+  let c=[]; let acc=0; for(let i=0;i<=60;i++){const x=-3+6*i/60; acc+=normPdf(0,1,x)*0.1; c.push(`${i/60*w},${h-h*0.9*Math.min(1,acc)}`);}
+  document.getElementById("cdfGlyph").innerHTML=`<line x1="0" x2="${w}" y1="${h-h*0.9}" y2="${h-h*0.9}" stroke="var(--line)" stroke-dasharray="3 3"/><text x="${w-2}" y="${h-h*0.9-3}" text-anchor="end" font-size="9" fill="var(--muted)">1</text><polyline points="${c.join(" ")}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+})();
+
+// ---------- family map ----------
+const NW=150,NH=70;
+const NODES={bern:[20,40],binom:[235,40],pois:[450,40],norm:[665,40],geom:[20,200],hyper:[235,200],unif:[665,200],beta:[880,200],negbin:[20,370],expo:[450,370],gamma:[665,370]};
+const EDGES=[
+  ["bern","binom","","n trials"],["binom","pois","n→∞, p→0","np = λ"],["pois","norm","λ large",""],
+  ["hyper","binom","N ≫ n",""],["bern","geom","wait for","1st success"],["geom","negbin","wait for","r successes"],
+  ["geom","expo","shrink the","time step"],["pois","expo","counts ↔ waits",""],["expo","gamma","sum of","k waits"],
+  ["unif","norm","average many","(CLT)"],["gamma","norm","k large",""],["beta","unif","α = β = 1",""]
+];
+function drawMap(){
+  const svg=document.getElementById("mapSvg"); let s="";
+  s+=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>`;
+  const clip=(cx,cy,tx,ty)=>{const dx=tx-cx,dy=ty-cy;const sx=(NW/2+8)/Math.abs(dx||1e-9),sy=(NH/2+8)/Math.abs(dy||1e-9);const t=Math.min(sx,sy);return [cx+dx*t,cy+dy*t];};
+  for(const [a,b,l1,l2] of EDGES){
+    const A=NODES[a],B=NODES[b]; const ax=A[0]+NW/2,ay=A[1]+NH/2,bx=B[0]+NW/2,by=B[1]+NH/2;
+    const [x1,y1]=clip(ax,ay,bx,by),[x2,y2]=clip(bx,by,ax,ay);
+    const mx=(x1+x2)/2,my=(y1+y2)/2; const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy); const nx=-dy/len,ny=dx/len;
+    const bidir=(a==="pois"&&b==="expo");
+    s+=`<line class="edge" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#arr)" ${bidir?'marker-start="url(#arr)"':""}/>`;
+    const off=Math.abs(dx)<1?46:(Math.abs(dy)<1?16:22);
+    const ox=mx+nx*off,oy=my+ny*off+4;
+    s+=`<text class="elabel" x="${ox}" y="${oy}" text-anchor="middle"><tspan x="${ox}" dy="0">${l1}</tspan><tspan class="m" x="${ox}" dy="12">${l2}</tspan></text>`;
+  }
+  { const A=NODES.binom,B=NODES.norm; const x1=A[0]+NW*0.7,y1=A[1],x2=B[0]+NW*0.3,y2=B[1]; const cx=(x1+x2)/2, cy=-14;
+    s+=`<path class="edge" d="M${x1},${y1} Q${cx},${cy} ${x2},${y2}" marker-end="url(#arr)"/>`;
+    s+=`<text class="elabel" x="${cx}" y="12" text-anchor="middle"><tspan x="${cx}" dy="0">n large</tspan><tspan class="m" x="${cx}" dy="12">(CLT)</tspan></text>`; }
+  { const A=NODES.binom,B=NODES.beta; const x1=A[0]+NW,y1=A[1]+NH*0.8,x2=B[0]+NW*0.5,y2=B[1]; const cx=(x1+x2)/2+60, cy=(y1+y2)/2-20;
+    s+=`<path class="edge" d="M${x1},${y1} Q${cx},${cy} ${x2},${y2}" marker-end="url(#arr)" stroke-dasharray="4 3"/>`;
+    s+=`<text class="elabel" x="${cx-20}" y="${cy+14}" text-anchor="middle"><tspan x="${cx-20}" dy="0">posterior of p</tspan></text>`; }
+  for(const id of ORDER){ const [x,y]=NODES[id],d=DISTS[id];
+    s+=`<g class="node ${d.fam}" data-id="${id}" tabindex="0" role="button" aria-label="Explore ${d.name}" transform="translate(${x},${y})">
+      <rect width="${NW}" height="${NH}" rx="8"/>
+      <text class="name" x="12" y="22">${d.name}</text>
+      <g transform="translate(12,30)">${miniShape(id,126,32)}</g>
+    </g>`; }
+  svg.innerHTML=s;
+  svg.querySelectorAll(".node").forEach(n=>{ const go=()=>{select(n.dataset.id);document.getElementById("explore").scrollIntoView({behavior:"smooth",block:"start"});};
+    n.addEventListener("click",go); n.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}}); });
+}
+function markActive(id){ document.querySelectorAll("#mapSvg .node").forEach(n=>n.classList.toggle("active",n.dataset.id===id)); }
+document.querySelectorAll(".tree .leaf").forEach(b=>b.onclick=()=>{select(b.dataset.id);document.getElementById("explore").scrollIntoView({behavior:"smooth",block:"start"});});
+
+// ---------- explorer ----------
+const W=640,H=300,M={l:44,r:16,t:16,b:34}; const PW=W-M.l-M.r,PH=H-M.t-M.b;
+let cur="binom", vals={}, samples=[], anim=null, view="pdf";
+function cfg(){return DISTS[cur];}
+function buildTabs(){ const t=document.getElementById("tabs"); t.innerHTML=ORDER.map(id=>`<button class="${DISTS[id].fam}" data-id="${id}">${DISTS[id].name}</button>`).join("");
+  t.querySelectorAll("button").forEach(b=>b.onclick=()=>select(b.dataset.id)); }
+document.querySelectorAll("#viewSeg button").forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll("#viewSeg button").forEach(x=>x.classList.toggle("on",x===b));render();});
+
+function clampVals(k){ if(cur==="unif"){ if(vals.b-vals.a<0.5){ if(k==="a")vals.a=vals.b-0.5; else vals.b=vals.a+0.5; } }
+  if(cur==="hyper"){ if(vals.K>vals.N)vals.K=vals.N; if(vals.n>vals.N)vals.n=vals.N; } }
+function select(id){ cur=id; const d=cfg(); vals=Object.fromEntries(d.params.map(p=>[p.k,p.v])); samples=[]; cancelAnimationFrame(anim);
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.id===id)); markActive(id);
+  document.getElementById("exName").innerHTML=`${d.name}<small>${d.fam==="disc"?"discrete":"continuous"}</small>`; document.getElementById("exName").className="name "+d.fam;
+  document.getElementById("exStory").textContent=d.story;
+  const sl=document.getElementById("sliders"); sl.innerHTML=d.params.map(p=>`<div class="row"><label>${p.k}<b id="v_${p.k}">${p.v}</b></label><input type="range" data-k="${p.k}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.v}" aria-label="${p.k}"></div>`).join("");
+  sl.querySelectorAll("input").forEach(i=>i.oninput=()=>{ vals[i.dataset.k]=+i.value; clampVals(i.dataset.k);
+    sl.querySelectorAll("input").forEach(j=>{j.value=vals[j.dataset.k]; document.getElementById("v_"+j.dataset.k).textContent=fmt(vals[j.dataset.k],2);}); samples=[]; render(); });
+  buildQuick(); render(); }
+
+function buildQuick(){ const d=cfg(); const q=document.getElementById("quick");
+  q.innerHTML=`
+    <div><div class="lab">Looks like</div><div class="chips">${d.examples.map(e=>`<span class="chip">${e}</span>`).join("")}</div>
+      <div class="lab" style="margin-top:12px">Key facts</div><ul class="facts">${d.facts.map(f=>`<li>${f}</li>`).join("")}</ul></div>
+    <div><div class="frm">
+      <span class="k">${d.pmf?"PMF":"PDF"}</span>${T(d.pmf_[0],d.pmf_[1])}
+      <span class="k">CDF</span>${T(d.cdf_[0],d.cdf_[1])}
+      <span class="k">mean</span>${T(d.mean_[0],d.mean_[1])}
+      <span class="k">variance</span>${T(d.var_[0],d.var_[1])}
+    </div></div>
+    <div class="remember">${d.remember}</div>
+    <details class="deep"><summary>Go deeper: properties, relatives, interview questions</summary>
+      <div class="deepgrid">
+        <div><div class="lab">Properties</div><ul>${d.traits.map(t=>`<li>${t}</li>`).join("")}</ul></div>
+        <div><div class="lab">Relatives</div><ul>${d.links.map(t=>`<li>${t}</li>`).join("")}</ul></div>
+        <div class="qa"><div class="lab">Interview questions</div>${d.qa.map(x=>`<details><summary>${x.q}</summary><p>${x.a}</p></details>`).join("")}</div>
+      </div></details>`;
+  typeset(q); }
+
+function scales(){ const d=cfg(); const [lo,hi]=d.domain(vals); const disc=!!d.pmf;
+  const x=disc? v=>M.l+((v-lo+0.5)/(hi-lo+1))*PW : v=>M.l+((v-lo)/(hi-lo))*PW;
+  let max=0; if(view==="cdf") max=1; else if(disc){for(let k=lo;k<=hi;k++)max=Math.max(max,d.pmf(vals,k));} else {for(let i=0;i<=200;i++)max=Math.max(max,d.pdf(vals,lo+(hi-lo)*i/200));}
+  if(view!=="cdf"){ if(cur==="unif") max=Math.max(max,1/(vals.b-vals.a)); if(cur==="beta") max=Math.min(max,6); max*=1.12; }
+  const y=v=>M.t+PH-Math.min(PH*1.05,(v/max)*PH); return {lo,hi,disc,x,y,max}; }
+function cdfAt(sc,xv){ const d=cfg(); if(sc.disc){ let c=0; for(let k=sc.lo;k<=Math.floor(xv);k++)c+=d.pmf(vals,k); return Math.min(1,c); }
+  const N=400,dx=(sc.hi-sc.lo)/N; let c=0; for(let i=0;i<N;i++){const x0=sc.lo+i*dx; if(x0>xv)break; c+=d.pdf(vals,x0+dx/2)*dx;} return Math.min(1,c); }
+
+function histogram(sc){ if(!samples.length) return null;
+  if(sc.disc){ const c=new Map(); samples.forEach(s=>c.set(s,(c.get(s)||0)+1)); return {kind:"disc",bins:[...c].map(([k,n])=>[k,n/samples.length])}; }
+  const B=32,w=(sc.hi-sc.lo)/B,c=new Array(B).fill(0); samples.forEach(s=>{const i=Math.min(B-1,Math.floor((s-sc.lo)/w)); if(i>=0&&i<B)c[i]++;});
+  return {kind:"cont",bins:c.map((n,i)=>[sc.lo+i*w,n/(samples.length*w)]),w}; }
+
+function render(){ const d=cfg(), sc=scales(); const svg=document.getElementById("exSvg"); const col=famColor(d.fam);
+  const mu=d.mean(vals), va=d.vari(vals), sd=Math.sqrt(va); let s="";
+  for(let i=1;i<=4;i++){const yy=M.t+PH-PH*i/4; s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${yy}" y2="${yy}" stroke="var(--line-soft)"/>`; s+=`<text x="${M.l-6}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--muted)" class="mono">${fmt(sc.max*i/4,sc.max<0.1?3:2)}</text>`;}
+  const bx1=Math.max(M.l,sc.x(mu-sd)), bx2=Math.min(W-M.r,sc.x(mu+sd));
+  s+=`<rect x="${bx1}" y="${M.t}" width="${Math.max(0,bx2-bx1)}" height="${PH}" fill="var(--band)"/>`;
+  if(view==="cdf"){
+    if(sc.disc){ let c=0,pts=[]; const hw=PW/(sc.hi-sc.lo+1)/2; pts.push([sc.x(sc.lo)-hw,sc.y(0)]); for(let k=sc.lo;k<=sc.hi;k++){ const xl=sc.x(k)-hw, xr=sc.x(k)+hw; pts.push([xl,sc.y(c)]); c=Math.min(1,c+d.pmf(vals,k)); pts.push([xl,sc.y(c)]); pts.push([xr,sc.y(c)]); }
+      s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="2"/>`;
+      let c2=0; for(let k=sc.lo;k<=sc.hi;k++){ c2=Math.min(1,c2+d.pmf(vals,k)); s+=`<circle cx="${sc.x(k)+hw}" cy="${sc.y(c2)}" r="3" fill="${col}"/>`; }
+    } else { const N=200,dx=(sc.hi-sc.lo)/N; let c=0,pts=[[sc.x(sc.lo),sc.y(0)]]; for(let i=0;i<N;i++){c=Math.min(1,c+d.pdf(vals,sc.lo+(i+0.5)*dx)*dx); pts.push([sc.x(sc.lo+(i+1)*dx),sc.y(c)]);}
+      const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+      s+=`<path d="${line} L${pts[pts.length-1][0]},${sc.y(0)} Z" fill="${famSoft(d.fam)}" opacity=".5"/><path d="${line}" fill="none" stroke="${col}" stroke-width="2"/>`; }
+    if(samples.length){ const so=[...samples].sort((a,b)=>a-b); let pts=[[M.l,sc.y(0)]]; so.forEach((v,i)=>{const xx=Math.min(W-M.r,Math.max(M.l,sc.x(sc.disc?v+0.5:v))); pts.push([xx,sc.y(i/so.length)]); pts.push([xx,sc.y((i+1)/so.length)]);}); pts.push([W-M.r,sc.y(1)]);
+      s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="var(--emp)" stroke-width="1.5"/>`; }
+  } else {
+    if(sc.disc){ const n=sc.hi-sc.lo+1, bw=Math.min(26,PW/n*0.62);
+      for(let k=sc.lo;k<=sc.hi;k++){const p=d.pmf(vals,k); const h=M.t+PH-sc.y(p); s+=`<rect x="${sc.x(k)-bw/2}" y="${sc.y(p)}" width="${bw}" height="${h}" rx="${Math.min(4,bw/2)}" fill="${col}"/>`;}
+    } else { const N=200; let pts=[]; for(let i=0;i<=N;i++){const xv=sc.lo+(sc.hi-sc.lo)*i/N; pts.push([sc.x(xv),sc.y(d.pdf(vals,xv))]);}
+      if(cur==="unif"){ pts=[[sc.x(sc.lo),sc.y(0)],[sc.x(vals.a),sc.y(0)],[sc.x(vals.a),sc.y(1/(vals.b-vals.a))],[sc.x(vals.b),sc.y(1/(vals.b-vals.a))],[sc.x(vals.b),sc.y(0)],[sc.x(sc.hi),sc.y(0)]]; }
+      const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+      s+=`<path d="${line} L${pts[pts.length-1][0]},${sc.y(0)} L${pts[0][0]},${sc.y(0)} Z" fill="${famSoft(d.fam)}" opacity=".6"/><path d="${line}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`; }
+    const hg=histogram(sc);
+    if(hg){ if(hg.kind==="disc"){ const n=sc.hi-sc.lo+1, bw=Math.min(26,PW/n*0.62)+6; hg.bins.forEach(([k,p])=>{ if(k<sc.lo||k>sc.hi)return; s+=`<rect x="${sc.x(k)-bw/2}" y="${sc.y(p)}" width="${bw}" height="${M.t+PH-sc.y(p)}" fill="none" stroke="var(--emp)" stroke-width="1.5" rx="3"/>`;}); }
+      else { hg.bins.forEach(([x0,dens])=>{ if(!dens)return; const x1=sc.x(x0),x2=sc.x(x0+hg.w); s+=`<rect x="${x1}" y="${sc.y(dens)}" width="${x2-x1}" height="${M.t+PH-sc.y(dens)}" fill="none" stroke="var(--emp)" stroke-width="1.2"/>`;}); } }
+  }
+  s+=`<line x1="${sc.x(mu)}" x2="${sc.x(mu)}" y1="${M.t}" y2="${M.t+PH}" stroke="var(--ink)" stroke-dasharray="3 3"/><text x="${sc.x(mu)+4}" y="${M.t+12}" font-size="11" class="mono">μ</text>`;
+  if(bx2-bx1>30) s+=`<text x="${(bx1+bx2)/2}" y="${M.t+PH-6}" font-size="10" text-anchor="middle" fill="var(--muted)" class="mono">±σ</text>`;
+  s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${M.t+PH}" y2="${M.t+PH}" stroke="var(--line)"/>`;
+  const ticks=sc.disc? Array.from({length:sc.hi-sc.lo+1},(_,i)=>sc.lo+i).filter((k,i,a)=>a.length<=16||i%Math.ceil(a.length/12)===0) : Array.from({length:7},(_,i)=>sc.lo+(sc.hi-sc.lo)*i/6);
+  ticks.forEach(t=>s+=`<text x="${sc.x(t)}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="var(--muted)" class="mono">${fmt(t,sc.disc?0:(sc.hi-sc.lo<2?2:1))}</text>`);
+  s+=`<g id="drops"></g>`;
+  svg.innerHTML=s;
+  document.getElementById("stMean").textContent=fmt(mu); document.getElementById("stSd").textContent=fmt(sd); document.getElementById("stVar").textContent=fmt(va);
+  document.getElementById("stN").textContent=samples.length;
+  const ro=document.getElementById("readout");
+  if(samples.length){ const xb=samples.reduce((a,b)=>a+b,0)/samples.length; const s2=samples.reduce((a,b)=>a+(b-xb)**2,0)/Math.max(1,samples.length-1); ro.innerHTML=`sample mean <b>${fmt(xb)}</b> vs μ <b>${fmt(mu)}</b> · sample var <b>${fmt(s2)}</b> vs σ² <b>${fmt(va)}</b>`; } else ro.textContent="No samples yet.";
+}
+
+(function(){ const svg=document.getElementById("exSvg"), tip=document.getElementById("tip");
+  svg.addEventListener("mousemove",e=>{ const r=svg.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width*W; if(px<M.l||px>W-M.r){tip.style.opacity=0;return;}
+    const d=cfg(),sc=scales(); let xv,pv,label;
+    if(sc.disc){ const k=Math.round(sc.lo+((px-M.l)/PW)*(sc.hi-sc.lo+1)-0.5); xv=k; if(view==="cdf"){pv=cdfAt(sc,k);label=`P(X≤${k}) = ${fmt(pv,3)}`;} else {pv=d.pmf(vals,k);label=`P(X=${k}) = ${fmt(pv,3)}`;} }
+    else { xv=sc.lo+((px-M.l)/PW)*(sc.hi-sc.lo); if(view==="cdf"){pv=cdfAt(sc,xv);label=`P(X≤${fmt(xv,2)}) = ${fmt(pv,3)}`;} else {pv=d.pdf(vals,xv);label=`x=${fmt(xv,2)}  f=${fmt(pv,3)}`;} }
+    tip.textContent=label; tip.style.left=(sc.x(view==="cdf"&&sc.disc?xv+0.5:xv)/W*100)+"%"; tip.style.top=(sc.y(pv)/H*100)+"%"; tip.style.opacity=1; });
+  svg.addEventListener("mouseleave",()=>tip.style.opacity=0); })();
+
+function draw(n){ const d=cfg(); const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const batch=[]; for(let i=0;i<n;i++)batch.push(d.sample(vals));
+  if(reduce||n>60||view==="cdf"){ samples.push(...batch); render(); return; }
+  const svg=document.getElementById("exSvg"); const sc=scales(); const col=famColor(d.fam);
+  const t0=performance.now(), dur=420, stagger=Math.min(18,600/n);
+  const dots=batch.map((v,i)=>({v,x:Math.min(W-M.r,Math.max(M.l,sc.x(v))),delay:i*stagger}));
+  let g=svg.querySelector("#drops"); const landed=new Set();
+  cancelAnimationFrame(anim);
+  function step(now){ let html=""; let allDone=true;
+    dots.forEach((o,i)=>{ const t=(now-t0-o.delay)/dur; if(t<0){allDone=false;return;} if(t>=1){ if(!landed.has(i)){landed.add(i);samples.push(o.v);} return; } allDone=false;
+      const e=t*t*(3-2*t); const y=M.t+e*(PH-8); html+=`<circle cx="${o.x}" cy="${y}" r="4" fill="${col}" stroke="var(--surface)" stroke-width="1.5"/>`; });
+    if(landed.size){ render(); g=svg.querySelector("#drops"); }
+    g.innerHTML=html; if(!allDone) anim=requestAnimationFrame(step); else render(); }
+  anim=requestAnimationFrame(step); }
+document.getElementById("draw1").onclick=()=>draw(1);
+document.getElementById("draw50").onclick=()=>draw(50);
+document.getElementById("draw500").onclick=()=>draw(500);
+document.getElementById("clear").onclick=()=>{samples=[];cancelAnimationFrame(anim);render();};
+
+// ---------- bridges ----------
+const BRIDGES=[
+  {id:"b2p",title:"Binomial → Poisson",sub:"many trials, each rare",
+   cap:t=>{const n=Math.round(6+194*t*t);return `n = <b>${n}</b>, p = <b>${fmt(4/n,3)}</b>, np = <b>4</b>. Bars: Binomial. Dots: Poisson(4).`;},
+   frame:t=>{const n=Math.round(6+194*t*t),p=4/n; return {disc:true,lo:0,hi:14,bars:k=>binomPmf(n,p,k),ref:k=>poisPmf(4,k),refKind:"dots"};},
+   what:"n grows while p shrinks so the expected count np stays fixed at 4. The Binomial bars slide onto the Poisson dots.",
+   why:"With huge n and tiny p, the exact trial count stops mattering. Only the average number of hits survives, and that single number is λ.",
+   rule:"n ≥ 20 and p ≤ 0.05  (or n ≥ 100, np ≤ 10)",
+   ask:"1,000,000 page views, each with a 0.000002 chance of a crash. Crashes today?",askA:"Poisson with λ = 2. P(0) = e⁻² ≈ 0.135. Nobody computes C(10⁶, k) here."},
+  {id:"b2n",title:"Binomial → Normal",sub:"many trials, p fixed",
+   cap:t=>{const n=Math.round(3+117*t*t);return `n = <b>${n}</b>, p = 0.3. Bars: Binomial. Line: Normal(np, np(1−p)).`;},
+   frame:t=>{const n=Math.round(3+117*t*t),p=0.3,m=n*p,s=Math.sqrt(n*p*(1-p)); return {disc:true,lo:Math.max(0,Math.floor(m-4*s)),hi:Math.min(n,Math.ceil(m+4*s)),bars:k=>binomPmf(n,p,k),ref:x=>normPdf(m,s,x),refKind:"line"};},
+   what:"n grows with p fixed. The skew fades and the bars fill in under a bell with the same mean and variance.",
+   why:"A Binomial is a sum of n Bernoullis. The Central Limit Theorem says sums of many independent terms are Normal, so the approximation is CLT in its simplest costume.",
+   rule:"np ≥ 10 and n(1−p) ≥ 10  (add a ±0.5 continuity correction for small n)",
+   ask:"Why can a z-test compare two conversion rates?",askA:"Each count is Binomial with np ≥ 10, so it is close to Normal. The difference of two Normals is Normal, and its standard error is known."},
+  {id:"h2b",title:"Hypergeometric → Binomial",sub:"the population grows",
+   cap:t=>{const N=Math.round(20+1980*t*t);return `N = <b>${N}</b>, K/N = 0.3, n = 12 draws. Bars: without replacement. Dots: Binomial(12, 0.3).`;},
+   frame:t=>{const N=Math.round(20+1980*t*t),K=Math.round(0.3*N); return {disc:true,lo:0,hi:12,bars:k=>hypPmf(N,K,12,k),ref:k=>binomPmf(12,0.3,k),refKind:"dots"};},
+   what:"Draws stay at 12 while the population N grows. Each draw removes a smaller share of the pool, so later odds barely move.",
+   why:"Without replacement matters only when a draw changes the remaining proportion. Once n/N is tiny, sampling with and without replacement are indistinguishable.",
+   rule:"n / N < 0.05",
+   ask:"You survey 500 people out of 10 million. Binomial or Hypergeometric?",askA:"Binomial. n/N is 0.00005, so the finite population correction is 0.99998. Nobody would notice."},
+  {id:"g2e",title:"Geometric → Exponential",sub:"trials become moments",
+   cap:t=>{const m=Math.round(1+59*t*t);return `<b>${m}</b> trials per unit time, p = 1/${m}. Bars: Geometric rescaled to time. Line: Exponential(1).`;},
+   frame:t=>{const m=Math.round(1+59*t*t),p=1/m; return {disc:false,lo:0,hi:5,step:1/m,bars:x=>geomPmf(p,Math.round(x*m))*m,ref:x=>expPdf(1,x),refKind:"line"};},
+   what:"Chop each unit of time into m tiny trials, each succeeding with probability 1/m. The staircase of trial counts smooths into a continuous wait.",
+   why:"Both are memoryless. Geometric is the only memoryless distribution on integers, Exponential the only one on the reals, so shrinking the step has nowhere else to go.",
+   rule:"Waiting for a rare per-tick event over many ticks: treat the wait as Exponential with rate = p per tick × ticks per unit time",
+   ask:"A sensor polls every millisecond and each poll has a 0.001 chance of detecting a hit. Distribution of time to first hit?",askA:"Geometric in polls, Exponential in time with rate 1 per second. Mean wait 1 second."},
+  {id:"e2g",title:"Exponential → Gamma",sub:"wait for k events, not one",
+   cap:t=>{const k=Math.round(1+7*t);return `k = <b>${k}</b> events, rate λ = 1. Line: Gamma(k, 1). Mean ${k}, variance ${k}.`;},
+   frame:t=>{const k=Math.round(1+7*t); return {disc:false,lo:0,hi:16,step:1/8,bars:x=>gammaPdf(k,1,x+1/16),ref:x=>gammaPdf(k,1,x),refKind:"line",soft:true};},
+   what:"Add one Exponential wait for each extra event. The shape moves from the decaying curve at k = 1 to a right-skewed bump that keeps marching right.",
+   why:"A Gamma with integer shape is literally a sum of k independent Exponential waits. Mean and variance both scale with k, so the relative spread shrinks like 1/√k, and the bump heads toward Normal.",
+   rule:"k = 1 is Exponential; k ≈ 30+ is close enough to Normal for most purposes",
+   ask:"Requests arrive at 10 per second. Time until the 100th request?",askA:"Gamma(100, 10). Mean 10 s, sd 1 s. Effectively Normal(10, 1) at this k."},
+  {id:"u2n",title:"Uniform → Normal",sub:"average anything, get a bell",
+   cap:t=>{const k=Math.round(1+7*t);return `Mean of <b>${k}</b> Uniform(0,1) draws. Bars: exact density. Line: Normal with the same mean and variance.`;},
+   frame:t=>{const k=Math.round(1+7*t); const sd=Math.sqrt(1/(12*k)); return {disc:false,lo:0,hi:1,step:1/64,bars:x=>irwinHall(k,x*k)*k,ref:x=>normPdf(0.5,sd,x),refKind:"line"};},
+   what:"Start with a flat Uniform. Average two draws and a triangle appears. Keep adding draws and the triangle rounds into a bell that narrows like 1/√k.",
+   why:"The Central Limit Theorem. It needs only independence and finite variance, not any particular starting shape. The flat Uniform is the least Normal-looking start you can pick, and it still converges within a handful of terms.",
+   rule:"n ≥ 30 is the folk threshold; symmetric inputs converge much faster, heavy-tailed inputs much slower",
+   ask:"Why is the Normal so common if real data is rarely Normal?",askA:"Because what we usually analyze is an average or a sum: sample means, totals, regression coefficients. CLT makes those Normal even when the raw data is not."}
+];
+function irwinHall(n,x){ if(x<0||x>n)return 0; let s=0; for(let k=0;k<=Math.floor(x);k++){ s+=(k%2?-1:1)*Math.exp(lchoose(n,k))*Math.pow(x-k,n-1); } return s/Math.exp(lgamma(n)); }
+let curB=BRIDGES[0], playing=null;
+function buildBridges(){ const l=document.getElementById("blist"); l.innerHTML=BRIDGES.map(b=>`<button data-id="${b.id}">${b.title}<small>${b.sub}</small></button>`).join("");
+  l.querySelectorAll("button").forEach(b=>b.onclick=()=>{curB=BRIDGES.find(x=>x.id===b.dataset.id); l.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); stopPlay(); document.getElementById("brT").value=0; renderBridge(0); buildBridgeText(); play();});
+  l.querySelector("button").classList.add("on"); buildBridgeText(); }
+function buildBridgeText(){ const b=curB; document.getElementById("bexp").innerHTML=`
+  <div><div class="lab">What is moving</div><p>${b.what}</p></div>
+  <div><div class="lab">Why it works</div><p>${b.why}</p></div>
+  <div><div class="lab">Rule of thumb</div><p class="rule">${b.rule}</p></div>
+  <div class="ask"><b>Interview:</b> ${b.ask} <span>${b.askA}</span></div>`; }
+function renderBridge(t){ const f=curB.frame(t); const svg=document.getElementById("brSvg"); let s="";
+  const xs=f.disc? v=>M.l+((v-f.lo+0.5)/(f.hi-f.lo+1))*PW : v=>M.l+((v-f.lo)/(f.hi-f.lo))*PW;
+  let max=0; const barsAt=[];
+  if(f.disc){ for(let k=f.lo;k<=f.hi;k++){const v=f.bars(k);barsAt.push([k,v]);max=Math.max(max,v,f.ref(k));} }
+  else { for(let x=f.lo;x<f.hi-1e-9;x+=f.step){const v=f.bars(x+f.step/2);barsAt.push([x,v]);max=Math.max(max,v);} for(let i=0;i<=200;i++)max=Math.max(max,f.ref(f.lo+(f.hi-f.lo)*i/200)); }
+  if(curB.id==="e2g") max=Math.max(max,0.42); max*=1.1; const ys=v=>M.t+PH-(v/max)*PH;
+  for(let i=1;i<=4;i++){const yy=M.t+PH-PH*i/4; s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${yy}" y2="${yy}" stroke="var(--line-soft)"/>`;}
+  if(f.disc){ const n=f.hi-f.lo+1,bw=Math.min(24,PW/n*0.62); barsAt.forEach(([k,v])=>s+=`<rect x="${xs(k)-bw/2}" y="${ys(v)}" width="${bw}" height="${M.t+PH-ys(v)}" rx="${Math.min(4,bw/2)}" fill="var(--disc)"/>`); }
+  else { barsAt.forEach(([x,v])=>{const x1=xs(x),x2=xs(x+f.step); s+=`<rect x="${x1}" y="${ys(v)}" width="${Math.max(0.5,x2-x1-(x2-x1>4?2:0))}" height="${M.t+PH-ys(v)}" fill="${f.soft?"var(--cont-soft)":"var(--disc)"}"/>`;}); }
+  if(f.refKind==="dots"){ for(let k=f.lo;k<=f.hi;k++) s+=`<circle cx="${xs(k)}" cy="${ys(f.ref(k))}" r="4.5" fill="var(--cont)" stroke="var(--surface)" stroke-width="1.5"/>`; }
+  else { const N=240; let d=""; for(let i=0;i<=N;i++){const xv=f.lo+(f.hi-f.lo)*i/N; d+=(i?"L":"M")+xs(xv).toFixed(1)+","+ys(f.ref(xv)).toFixed(1);} s+=`<path d="${d}" fill="none" stroke="var(--cont)" stroke-width="2.2" stroke-linejoin="round"/>`; }
+  s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${M.t+PH}" y2="${M.t+PH}" stroke="var(--line)"/>`;
+  const ticks=f.disc? Array.from({length:f.hi-f.lo+1},(_,i)=>f.lo+i).filter((k,i,a)=>a.length<=16||i%Math.ceil(a.length/12)===0) : Array.from({length:6},(_,i)=>f.lo+(f.hi-f.lo)*i/5);
+  ticks.forEach(tk=>s+=`<text x="${xs(tk)}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="var(--muted)" class="mono">${fmt(tk,f.disc?0:1)}</text>`);
+  svg.innerHTML=s; document.getElementById("brCap").innerHTML=curB.cap(t); }
+function play(){ stopPlay(); const el=document.getElementById("brT"); const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; if(reduce){el.value=1000;renderBridge(1);return;}
+  const t0=performance.now(), from=+el.value/1000, dur=3200*(1-from); document.getElementById("brPlay").textContent="Pause";
+  function step(now){ const t=Math.min(1,from+(now-t0)/dur*(1-from)); el.value=Math.round(t*1000); renderBridge(t); if(t<1) playing=requestAnimationFrame(step); else stopPlay(); }
+  playing=requestAnimationFrame(step); }
+function stopPlay(){ cancelAnimationFrame(playing); playing=null; document.getElementById("brPlay").textContent="Play"; }
+document.getElementById("brPlay").onclick=()=>{ if(playing) stopPlay(); else { const el=document.getElementById("brT"); if(+el.value>=1000) el.value=0; play(); } };
+document.getElementById("brT").oninput=e=>{stopPlay();renderBridge(+e.target.value/1000);};
+
+// ---------- drill ----------
+const DRILL=[
+  {q:"Probability of at least one six in four rolls?",tag:"complement",a:"Never add. Take the complement: 1 − (5/6)⁴ ≈ <b>0.518</b>. 'At least one' almost always means 1 − P(none)."},
+  {q:"Expected number of coin flips to see the first head?",tag:"geometric",a:"Geometric with p = 1/2, mean 1/p = <b>2</b>. Follow-up: to see two heads in a row it is <b>6</b>, by first-step analysis: E = 2 + (1/2)·E for the reset after HT plus a smaller term. Solve E = 2 + E/2 + 1 → E = 6."},
+  {q:"How many people in a room before two share a birthday with probability ½?",tag:"complement",a:"P(all different) = 365/365 · 364/365 · … · (365−n+1)/365. It drops below 0.5 at n = <b>23</b>. Interviewers want the complement setup, not the number."},
+  {q:"Given only Uniform(0,1) draws, generate a Normal.",tag:"uniform → normal",a:"Box–Muller: with U₁, U₂ Uniform, Z = √(−2 ln U₁) · cos(2πU₂) is standard Normal. Alternative answer: inverse-CDF sampling Z = Φ⁻¹(U), or average 12 Uniforms and subtract 6 as a crude approximation."},
+  {q:"A site averages 100 sign-ups a day. Chance of none in the next hour?",tag:"poisson",a:"Scale the rate: λ = 100/24 ≈ 4.17 per hour. P(0) = e^(−4.17) ≈ <b>0.015</b>. Scaling λ with the window is the whole trick."},
+  {q:"Make a fair coin out of a biased one.",tag:"bernoulli",a:"Flip twice. HT means heads, TH means tails, HH or TT means flip again. Both accepted outcomes have probability p(1−p), so they are equally likely. The number of rounds is Geometric."},
+  {q:"Distribution of the sum of two dice? P(7)?",tag:"convolution",a:"Triangular from 2 to 12, peaked at 7. P(7) = 6/36 = <b>1/6</b>. Sums of independent variables convolve, which is why the CLT staircase starts as a triangle."},
+  {q:"Two variants: A got 40/1000, B got 55/1000. Is B better? Two ways.",tag:"binomial · beta",a:"Frequentist: two-proportion z-test, pooled p = 0.0475, z ≈ 1.57, p-value ≈ 0.12, not significant at 5%. Bayesian: sample p_A ~ Beta(41, 961), p_B ~ Beta(56, 946); P(B > A) ≈ <b>0.94</b>. Same data, two honest framings; know both."}
+];
+function buildDrill(){ document.getElementById("drillGrid").innerHTML=DRILL.map(d=>`<details><summary>${d.q}<span class="tag">${d.tag}</span></summary><p>${d.a}</p></details>`).join(""); }
+
+// ---------- export ----------
+document.getElementById("copyMd").onclick=async()=>{ const md=["# Probability distributions","","| Distribution | Type | Story | PMF/PDF | Mean | Variance | Remember |","|---|---|---|---|---|---|---|",
+  ...ORDER.map(id=>{const d=DISTS[id];return `| ${d.name} | ${d.fam==="disc"?"discrete":"continuous"} | ${d.story} | $${d.pmf_[0]}$ | $${d.mean_[0]}$ | $${d.var_[0]}$ | ${d.remember.replace(/<[^>]+>/g,"")} |`;}),"",
+  "## Bridges",...BRIDGES.map(b=>`- **${b.title}** (${b.sub}). Rule: ${b.rule}`),"",
+  "## Drill",...DRILL.map(d=>`- **${d.q}** ${d.a.replace(/<[^>]+>/g,"")}`)].join("\n");
+  try{ await navigator.clipboard.writeText(md); const b=document.getElementById("copyMd"); b.textContent="Copied"; setTimeout(()=>b.textContent="Copy summary as markdown",1500);}catch{ prompt("Copy:",md); } };
+
+// ---------- init ----------
+drawMap(); buildTabs(); select("binom"); buildBridges(); renderBridge(0); buildDrill();
+</script>
+</body></html>

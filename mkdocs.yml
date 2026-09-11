@@ -1,0 +1,99 @@
+site_name: Interview Atlas
+site_url: https://ytchou.github.io/interview-atlas/
+site_description: An interactive study guide for data science interviews
+site_author: Patrick Chou
+repo_url: https://github.com/ytchou/interview-atlas
+repo_name: ytchou/interview-atlas
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.tooltips
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Part I — Statistics:
+    - part1-statistics/index.md
+    - 1. Probability Foundations: part1-statistics/01-probability-foundations.md
+    - 2. Probability Distributions: part1-statistics/02-distributions.md
+    - 3. Hypothesis Testing: part1-statistics/03-hypothesis-testing.md
+    - 4. Sampling & Resampling: part1-statistics/04-sampling.md
+    - 5. Markov Chains: part1-statistics/05-markov-chains.md
+  - Part II — Experimentation:
+    - part2-experimentation/index.md
+    - 6. Running an A/B Test: part2-experimentation/06-ab-testing.md
+    - 7. A/B Testing Pitfalls: part2-experimentation/07-ab-pitfalls.md
+    - 8. Bayesian vs Frequentist: part2-experimentation/08-bayesian-vs-frequentist.md
+  - Part III — Causal Inference:
+    - part3-causal/index.md
+    - 9. Matching & Propensity Scores: part3-causal/09-propensity-scores.md
+    - 10. DiD, Synthetic Control & ITS: part3-causal/10-did-sc-its.md
+    - 11. Regression Discontinuity: part3-causal/11-rdd.md
+    - 12. Meta-Learners & Double ML: part3-causal/12-meta-learners.md
+  - Part IV — Machine Learning:
+    - part4-ml/index.md
+    - 13. Loss Functions & Metrics: part4-ml/13-loss-metrics.md
+    - 14. Core Concepts: part4-ml/14-core-concepts.md
+    - 15. Ensembles & Boosting: part4-ml/15-ensembles.md
+    - 16. Clustering: part4-ml/16-clustering.md
+    - 17. Neural Networks: part4-ml/17-neural-networks.md
+    - 18. NLP: part4-ml/18-nlp.md
+  - Part V — Coding & Systems:
+    - part5-coding/index.md
+    - 19. Data Structures & Algorithms: part5-coding/19-dsa.md
+    - 20. SQL: part5-coding/20-sql.md
+    - 21. Toolbox: part5-coding/21-toolbox.md
+    - 22. ML System Design: part5-coding/22-ml-system-design.md

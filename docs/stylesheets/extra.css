@@ -1,0 +1,72 @@
+/* ── status badges ── */
+.md-nav__link[data-status]::after {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.md-nav__link[data-status="done"]::after {
+  content: "done";
+  background: #1baf7a22;
+  color: #1baf7a;
+}
+.md-nav__link[data-status="draft"]::after {
+  content: "draft";
+  background: #eda10022;
+  color: #c98500;
+}
+.md-nav__link[data-status="todo"]::after {
+  content: "todo";
+  background: #5d647022;
+  color: #5d6470;
+}
+
+/* ── interactive embed ── */
+.interactive-frame {
+  width: 100%;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  min-height: 700px;
+}
+
+.fullscreen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--md-default-fg-color--light);
+  margin-top: 6px;
+}
+.fullscreen-link:hover {
+  color: var(--md-accent-fg-color);
+}
+
+/* ── progress table ── */
+.progress-table {
+  font-size: 0.9rem;
+}
+.progress-table td:nth-child(3),
+.progress-table th:nth-child(3) {
+  text-align: center;
+}
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.badge.done   { background: #1baf7a22; color: #1baf7a; }
+.badge.draft  { background: #eda10022; color: #c98500; }
+.badge.todo   { background: #5d647022; color: #5d6470; }
+
+/* ── general polish ── */
+.md-typeset h1 {
+  font-weight: 600;
+}
