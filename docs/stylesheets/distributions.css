@@ -1,0 +1,153 @@
+/* Distribution Atlas — scoped to .dist-atlas so it composes with Material.
+   Colors map onto Material's own tokens so light/dark follow the site toggle. */
+.md-typeset .dist-atlas{
+  --surface:var(--md-default-bg-color);
+  --ink:var(--md-default-fg-color);
+  --muted:var(--md-default-fg-color--light);
+  --line:var(--md-typeset-table-color);
+  --line-soft:var(--md-code-bg-color);
+  --disc:#2a78d6; --disc-soft:#cde2fb; --cont:#eb6834; --cont-soft:#fbd9c9;
+  --emp:var(--md-default-fg-color); --band:rgba(21,24,29,.07);
+  --font-mono:var(--md-code-font-family);
+  font-size:15px;line-height:1.5;color:var(--ink);
+}
+[data-md-color-scheme="slate"] .md-typeset .dist-atlas{
+  --disc:#3987e5; --disc-soft:#1c3a5f; --cont:#d95926; --cont-soft:#4a2a1c; --band:rgba(238,240,243,.08);
+}
+.md-typeset .dist-atlas svg{display:block;width:100%;height:auto}
+.md-typeset .dist-atlas svg text{fill:var(--ink)}
+.md-typeset .dist-atlas .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.md-typeset .dist-atlas .hint{color:var(--muted);font-size:13px;margin:0 0 14px;max-width:70ch}
+.md-typeset .dist-atlas .key{display:inline-flex;gap:14px;font-size:12px;color:var(--muted);margin:6px 0 12px;flex-wrap:wrap}
+.md-typeset .dist-atlas .key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.md-typeset .dist-atlas .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 8px}
+.md-typeset .dist-atlas button{font:inherit}
+.md-typeset .dist-atlas .btn{font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:background .15s}
+.md-typeset .dist-atlas .btn:hover{background:var(--line-soft)}
+.md-typeset .dist-atlas .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.md-typeset .dist-atlas .btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.md-typeset .dist-atlas .btn.primary:hover{opacity:.85}
+.md-typeset .dist-atlas .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.md-typeset .dist-atlas .seg button{font-size:12.5px;padding:4px 10px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.md-typeset .dist-atlas .seg button.on{background:var(--ink);color:var(--surface)}
+.md-typeset .dist-atlas mjx-container{color:var(--ink);font-size:16px}
+.md-typeset .dist-atlas mjx-container svg{width:auto;height:auto;display:inline}
+.md-typeset .dist-atlas .tex{display:inline-block}
+.md-typeset .dist-atlas .lab{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+
+/* reset Material's admonition-style details inside the widget */
+.md-typeset .dist-atlas details{display:block;border:0;box-shadow:none;margin:0;padding:0;background:transparent;font-size:inherit;overflow:visible}
+.md-typeset .dist-atlas details>summary{display:block;background:transparent;border:0;padding:0;margin:0;min-height:0;cursor:pointer;list-style:none}
+.md-typeset .dist-atlas details>summary::before,.md-typeset .dist-atlas details>summary::after{display:none;content:none}
+.md-typeset .dist-atlas details>summary::-webkit-details-marker{display:none}
+.md-typeset .dist-atlas ul{list-style:none;margin:0;padding:0}
+.md-typeset .dist-atlas li{margin:0}
+
+/* primer */
+.md-typeset .dist-atlas .primer{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:4px 0 8px}
+@media (max-width:720px){.md-typeset .dist-atlas .primer{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .primer .p{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.md-typeset .dist-atlas .primer .p b{display:block;font-weight:600;font-size:15px}
+.md-typeset .dist-atlas .primer .p span{font-size:13px;color:var(--muted)}
+.md-typeset .dist-atlas .primer svg{height:48px;margin:6px 0 4px}
+
+/* map */
+.md-typeset .dist-atlas .map .node{cursor:pointer}
+.md-typeset .dist-atlas .map .node>rect{fill:var(--surface);stroke:var(--line);stroke-width:1.2;transition:stroke .2s}
+.md-typeset .dist-atlas .map .node:hover>rect,.md-typeset .dist-atlas .map .node:focus-visible>rect{stroke:var(--ink)}
+.md-typeset .dist-atlas .map .node.active>rect{stroke-width:2}
+.md-typeset .dist-atlas .map .node.disc.active>rect{stroke:var(--disc)}
+.md-typeset .dist-atlas .map .node.cont.active>rect{stroke:var(--cont)}
+.md-typeset .dist-atlas .map .node text.name{font-size:14.5px;font-weight:600}
+.md-typeset .dist-atlas .map .edge{fill:none;stroke:var(--muted);stroke-width:1.2;opacity:.7}
+.md-typeset .dist-atlas .map .elabel{font-size:10.5px;fill:var(--muted);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.md-typeset .dist-atlas .map .elabel tspan.m{font-family:var(--font-mono)}
+
+/* decision tree */
+.md-typeset .dist-atlas .tree{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+@media (max-width:720px){.md-typeset .dist-atlas .tree{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .tree .root{font-size:16px;font-weight:600;margin-bottom:8px}
+.md-typeset .dist-atlas .tree .root i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.md-typeset .dist-atlas .tree ul{padding-left:16px;border-left:1.5px solid var(--line)}
+.md-typeset .dist-atlas .tree li{margin:6px 0;font-size:14px;position:relative;padding-left:12px}
+.md-typeset .dist-atlas .tree li::before{content:"";position:absolute;left:-16px;top:.75em;width:22px;border-top:1.5px solid var(--line)}
+.md-typeset .dist-atlas .tree .q{color:var(--muted)}
+.md-typeset .dist-atlas .tree .leaf{font-size:13.5px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;margin-left:4px}
+.md-typeset .dist-atlas .tree .leaf:hover{border-color:var(--ink)}
+.md-typeset .dist-atlas .tree .leaf.disc{border-color:var(--disc);color:var(--disc)}
+.md-typeset .dist-atlas .tree .leaf.cont{border-color:var(--cont);color:var(--cont)}
+.md-typeset .dist-atlas .tree .leaf.disc:hover{background:var(--disc);color:#fff}
+.md-typeset .dist-atlas .tree .leaf.cont:hover{background:var(--cont);color:#fff}
+
+/* explorer */
+.md-typeset .dist-atlas .explorer{display:grid;grid-template-columns:1fr 240px;gap:18px}
+@media (max-width:720px){.md-typeset .dist-atlas .explorer{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.md-typeset .dist-atlas .tabs button{font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.md-typeset .dist-atlas .tabs button:hover{color:var(--ink)}
+.md-typeset .dist-atlas .tabs button.on.disc{background:var(--disc);border-color:var(--disc);color:#fff}
+.md-typeset .dist-atlas .tabs button.on.cont{background:var(--cont);border-color:var(--cont);color:#fff}
+.md-typeset .dist-atlas .chart-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 4px 6px}
+.md-typeset .dist-atlas .chart-title .name{font-size:21px;font-weight:600}
+.md-typeset .dist-atlas .chart-title .name small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+.md-typeset .dist-atlas .chart-title .name.disc small{color:var(--disc)}
+.md-typeset .dist-atlas .chart-title .name.cont small{color:var(--cont)}
+.md-typeset .dist-atlas .ctrl{display:flex;flex-direction:column;gap:14px}
+.md-typeset .dist-atlas .ctrl .row label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.md-typeset .dist-atlas .ctrl .row label b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+.md-typeset .dist-atlas input[type=range]{width:100%;accent-color:var(--ink);margin:6px 0 0}
+.md-typeset .dist-atlas .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;border-top:1px solid var(--line);padding-top:12px}
+.md-typeset .dist-atlas .stats .k{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.md-typeset .dist-atlas .stats .v{font-family:var(--font-mono);font-size:17px;font-variant-numeric:tabular-nums}
+.md-typeset .dist-atlas .actions{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line);padding-top:12px}
+.md-typeset .dist-atlas .readout{font-size:13px;color:var(--muted);min-height:20px}
+.md-typeset .dist-atlas .readout b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+.md-typeset .dist-atlas .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font-family:var(--font-mono);font-size:12px;padding:4px 8px;border-radius:4px;white-space:nowrap;transform:translate(-50%,-130%);opacity:0;transition:opacity .1s}
+.md-typeset .dist-atlas .chartwrap{position:relative}
+.md-typeset .dist-atlas .story{margin:10px 4px 0;font-size:15px;max-width:66ch}
+
+/* per-distribution quick read */
+.md-typeset .dist-atlas .quick{grid-column:1/-1;border-top:1px solid var(--line);margin-top:6px;padding-top:14px;display:grid;grid-template-columns:1.25fr 1fr;gap:14px 28px}
+@media (max-width:720px){.md-typeset .dist-atlas .quick{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .chips{display:flex;flex-wrap:wrap;gap:6px}
+.md-typeset .dist-atlas .chip{font-size:12.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink)}
+.md-typeset .dist-atlas .facts{padding-left:18px;font-size:14px;list-style:disc}
+.md-typeset .dist-atlas .facts li{margin:3px 0}
+.md-typeset .dist-atlas .frm{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:start;font-size:14px}
+.md-typeset .dist-atlas .frm .k{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding-top:4px}
+.md-typeset .dist-atlas .frm .tex{font-family:var(--font-mono);font-size:13px}
+.md-typeset .dist-atlas .remember{grid-column:1/-1;background:var(--line-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.md-typeset .dist-atlas details.deep{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px}
+.md-typeset .dist-atlas details.deep>summary{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.md-typeset .dist-atlas details.deep>summary::before{display:inline-block;content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;position:static;background:none;mask:none;-webkit-mask:none}
+.md-typeset .dist-atlas details.deep[open]>summary::before{transform:rotate(45deg)}
+.md-typeset .dist-atlas details.deep>summary:hover{color:var(--ink)}
+.md-typeset .dist-atlas .deepgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px;margin-top:12px}
+@media (max-width:720px){.md-typeset .dist-atlas .deepgrid{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .deepgrid ul{padding-left:18px;font-size:14px;list-style:disc}
+.md-typeset .dist-atlas .deepgrid li{margin:4px 0}
+.md-typeset .dist-atlas .qa{grid-column:1/-1}
+.md-typeset .dist-atlas .qa details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:14px}
+.md-typeset .dist-atlas .qa details>summary{font-weight:500}
+.md-typeset .dist-atlas .qa p{margin:6px 0 0;color:var(--muted)}
+.md-typeset .dist-atlas .qa p b{color:var(--ink);font-weight:500}
+
+/* bridges */
+.md-typeset .dist-atlas .bridges{display:grid;grid-template-columns:1fr 240px;gap:18px}
+@media (max-width:720px){.md-typeset .dist-atlas .bridges{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .blist{display:flex;flex-direction:column;gap:6px}
+.md-typeset .dist-atlas .blist button{text-align:left;font-size:13.5px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;line-height:1.3}
+.md-typeset .dist-atlas .blist button small{display:block;color:var(--muted);font-size:12px}
+.md-typeset .dist-atlas .blist button.on{border-color:var(--ink);background:var(--line-soft)}
+.md-typeset .dist-atlas .scrub{display:flex;align-items:center;gap:10px;margin-top:10px}
+.md-typeset .dist-atlas .scrub input{flex:1;margin:0}
+.md-typeset .dist-atlas .bcap{font-size:13px;color:var(--muted);margin:8px 4px 0}
+.md-typeset .dist-atlas .bcap b{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+.md-typeset .dist-atlas .bexp{grid-column:1/-1;border-top:1px solid var(--line);margin-top:8px;padding-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 24px}
+@media (max-width:720px){.md-typeset .dist-atlas .bexp{grid-template-columns:1fr}}
+.md-typeset .dist-atlas .bexp p{margin:0;font-size:14px}
+.md-typeset .dist-atlas .bexp .rule{font-family:var(--font-mono);font-size:13px}
+.md-typeset .dist-atlas .bexp .ask{grid-column:1/-1;background:var(--line-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.md-typeset .dist-atlas .bexp .ask b{font-weight:600}
+.md-typeset .dist-atlas .bexp .ask span{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.md-typeset .dist-atlas *{transition:none!important}}
