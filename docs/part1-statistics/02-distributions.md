@@ -4,11 +4,11 @@ status: draft
 
 # 2. Probability Distributions
 
-Every named distribution an interviewer asks about is a coin flip, a count, or a wait, pushed to a limit.
+Every named distribution an interviewer asks about is a coin flip, a count, or a wait, pushed to a limit. Drag the sliders, draw samples, press play.
 
-[Open the Distribution Atlas :material-open-in-new:](../interactive/distributions.html){ .md-button .md-button--primary style="font-size: 1.1rem; padding: 12px 28px; margin: 16px 0 24px;" }
+<iframe src="/interview-atlas/interactive/distributions.html" style="width:100%;height:85vh;min-height:700px;border:1px solid var(--md-default-fg-color--lightest);border-radius:8px;" loading="lazy" title="Distribution Atlas"></iframe>
 
-The interactive explorer covers eleven distributions, their family relationships, animated limit bridges, a "which one?" decision tree, and a drill of classic interview problems. **Drag sliders, draw samples, press play.**
+<small><a href="../interactive/distributions.html" target="_blank">:material-open-in-new: Open full screen</a></small>
 
 ---
 
