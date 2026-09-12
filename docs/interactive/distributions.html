@@ -1,10 +1,13 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">
 <title>Distribution Atlas — Interview Atlas</title>
-<div style="background:#4051b5;color:#fff;padding:8px 20px;font-family:system-ui,-apple-system,sans-serif;font-size:14px;display:flex;align-items:center;gap:16px">
-<a href="../part1-statistics/02-distributions/" style="color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px">← Back to book</a>
-<span style="opacity:.6">|</span>
-<a href="../" style="color:#fff;text-decoration:none">Interview Atlas</a>
-<span style="margin-left:auto;opacity:.6;font-size:12px">Ch. 2 — Probability Distributions</span>
+<div style="background:#4051b5;color:#fff;padding:8px 20px;font-family:system-ui,-apple-system,sans-serif;font-size:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+<a href="../" style="color:#fff;text-decoration:none;font-weight:600">Interview Atlas</a>
+<span style="opacity:.4">›</span>
+<a href="../part1-statistics/" style="color:rgba(255,255,255,.75);text-decoration:none">Part I — Statistics</a>
+<span style="margin-left:auto;display:flex;gap:16px;font-size:13px">
+<a href="../part1-statistics/01-probability-foundations/" style="color:rgba(255,255,255,.75);text-decoration:none">← Ch. 1</a>
+<a href="../part1-statistics/03-hypothesis-testing/" style="color:rgba(255,255,255,.75);text-decoration:none">Ch. 3 →</a>
+</span>
 </div>
 <script>
 window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global",scale:0.96},options:{enableMenu:false},
@@ -190,12 +193,20 @@ details.deep summary:hover{color:var(--ink)}
 .notes b{color:var(--ink);font-weight:500}
 .foot{margin-top:40px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* reference tables */
+.ref-table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 20px}
+.ref-table th{text-align:left;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid var(--line)}
+.ref-table td{padding:8px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.ref-table tr:last-child td{border-bottom:0}
+.ref-table td:first-child{white-space:nowrap}
+.ref-table .tex{font-family:var(--font-mono);font-size:13px}
+h3{font-family:var(--font-display);font-weight:500;font-size:18px;margin:0 0 6px}
 </style>
 
 <div class="wrap">
 <nav>
   <span class="brand">Distribution Atlas</span>
-  <a href="#basics">Basics</a><a href="#map">Map</a><a href="#which">Which one</a><a href="#explore">Explore</a><a href="#bridges">Bridges</a><a href="#drill">Drill</a>
+  <a href="#basics">Basics</a><a href="#map">Map</a><a href="#which">Which one</a><a href="#explore">Explore</a><a href="#reference">Reference</a><a href="#bridges">Bridges</a><a href="#drill">Drill</a>
 </nav>
 
 <h1>Eleven distributions, one family.</h1>
@@ -290,6 +301,57 @@ details.deep summary:hover{color:var(--ink)}
     </div>
     <div class="quick" id="quick"></div>
   </div>
+</section>
+
+<section id="reference">
+  <h2>Reference</h2>
+  <p class="hint">The formulas and key numbers on one screen. Scroll down to Bridges for the limit animations.</p>
+
+  <h3 style="margin-top:24px">Discrete distributions</h3>
+  <div style="overflow-x:auto">
+  <table class="ref-table">
+    <thead><tr><th>Distribution</th><th>Story</th><th>PMF</th><th>Mean</th><th>Variance</th></tr></thead>
+    <tbody>
+      <tr><td><b>Bernoulli</b></td><td>One trial, success prob p</td><td class="tex" data-tex="P(X\!=\!1)=p">P(X=1)=p</td><td class="tex" data-tex="p">p</td><td class="tex" data-tex="p(1-p)">p(1−p)</td></tr>
+      <tr><td><b>Binomial</b></td><td>k successes in n trials</td><td class="tex" data-tex="\binom{n}{k}p^k(1-p)^{n-k}">C(n,k)pᵏ(1−p)ⁿ⁻ᵏ</td><td class="tex" data-tex="np">np</td><td class="tex" data-tex="np(1-p)">np(1−p)</td></tr>
+      <tr><td><b>Geometric</b></td><td>Trials until first success</td><td class="tex" data-tex="(1-p)^{k-1}p">(1−p)ᵏ⁻¹p</td><td class="tex" data-tex="\frac{1}{p}">1/p</td><td class="tex" data-tex="\frac{1-p}{p^2}">(1−p)/p²</td></tr>
+      <tr><td><b>Neg. Binomial</b></td><td>Failures before r-th success</td><td class="tex" data-tex="\binom{k+r-1}{k}p^r(1-p)^k">C(k+r−1,k)pʳ(1−p)ᵏ</td><td class="tex" data-tex="\frac{r(1-p)}{p}">r(1−p)/p</td><td class="tex" data-tex="\frac{r(1-p)}{p^2}">r(1−p)/p²</td></tr>
+      <tr><td><b>Hypergeometric</b></td><td>Draws without replacement</td><td class="tex" data-tex="\frac{\binom{K}{x}\binom{N-K}{n-x}}{\binom{N}{n}}">C(K,x)C(N−K,n−x)/C(N,n)</td><td class="tex" data-tex="\frac{nK}{N}">nK/N</td><td class="tex" data-tex="n\frac{K}{N}(1-\frac{K}{N})\frac{N-n}{N-1}">complex</td></tr>
+      <tr><td><b>Poisson</b></td><td>Events at rate λ</td><td class="tex" data-tex="\frac{\lambda^k e^{-\lambda}}{k!}">λᵏe⁻ᵡ/k!</td><td class="tex" data-tex="\lambda">λ</td><td class="tex" data-tex="\lambda">λ</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="margin-top:24px">Continuous distributions</h3>
+  <div style="overflow-x:auto">
+  <table class="ref-table">
+    <thead><tr><th>Distribution</th><th>Story</th><th>PDF</th><th>Mean</th><th>Variance</th></tr></thead>
+    <tbody>
+      <tr><td><b>Uniform</b></td><td>Flat on [a, b]</td><td class="tex" data-tex="\frac{1}{b-a}">1/(b−a)</td><td class="tex" data-tex="\frac{a+b}{2}">(a+b)/2</td><td class="tex" data-tex="\frac{(b-a)^2}{12}">(b−a)²/12</td></tr>
+      <tr><td><b>Beta</b></td><td>Distribution over a probability</td><td class="tex" data-tex="\frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}">x^(α−1)(1−x)^(β−1)/B(α,β)</td><td class="tex" data-tex="\frac{\alpha}{\alpha+\beta}">α/(α+β)</td><td class="tex" data-tex="\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}">complex</td></tr>
+      <tr><td><b>Exponential</b></td><td>Wait until next event</td><td class="tex" data-tex="\lambda e^{-\lambda x}">λe⁻ᵡˣ</td><td class="tex" data-tex="\frac{1}{\lambda}">1/λ</td><td class="tex" data-tex="\frac{1}{\lambda^2}">1/λ²</td></tr>
+      <tr><td><b>Gamma</b></td><td>Wait until k-th event</td><td class="tex" data-tex="\frac{\lambda^k x^{k-1} e^{-\lambda x}}{\Gamma(k)}">λᵏxᵏ⁻¹e⁻ᵡˣ/Γ(k)</td><td class="tex" data-tex="\frac{k}{\lambda}">k/λ</td><td class="tex" data-tex="\frac{k}{\lambda^2}">k/λ²</td></tr>
+      <tr><td><b>Normal</b></td><td>Sum of many small effects</td><td class="tex" data-tex="\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}">bell curve</td><td class="tex" data-tex="\mu">μ</td><td class="tex" data-tex="\sigma^2">σ²</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="margin-top:24px">Approximation rules</h3>
+  <div style="overflow-x:auto">
+  <table class="ref-table">
+    <thead><tr><th>From → To</th><th>When</th><th>Rule of thumb</th></tr></thead>
+    <tbody>
+      <tr><td>Binomial → Poisson</td><td>n large, p small</td><td class="mono">n ≥ 20, p ≤ 0.05</td></tr>
+      <tr><td>Binomial → Normal</td><td>n large</td><td class="mono">np ≥ 10, n(1−p) ≥ 10</td></tr>
+      <tr><td>Hyper → Binomial</td><td>Population large</td><td class="mono">n/N &lt; 0.05</td></tr>
+      <tr><td>Geometric → Exponential</td><td>Shrink the time step</td><td>Rare per-tick → continuous wait</td></tr>
+      <tr><td>Exponential → Gamma</td><td>Sum k waits</td><td class="mono">k = 1 is Exponential</td></tr>
+      <tr><td>Anything → Normal</td><td>Average many</td><td class="mono">n ≥ 30 (folk threshold)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="notes" style="margin-top:24px"><b>Not on this page.</b> The t, χ², and F distributions describe test statistics, not data — they live with <a href="../part1-statistics/03-hypothesis-testing/">hypothesis testing</a>. Log-normal (log X is Normal) is right-skewed and positive, common for prices and durations.</p>
 </section>
 
 <section id="bridges">
